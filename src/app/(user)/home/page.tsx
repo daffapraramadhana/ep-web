@@ -106,7 +106,7 @@ export default function HomePage() {
         }
       />
 
-      <div className="home-body space-y-3.5 px-5 pt-[18px] pb-6">
+      <div className="home-body space-y-3.5 px-5 pt-[18px] pb-6 lg:px-0">
         {error ? <p className="text-sm font-semibold text-bad">{error}</p> : null}
 
         {summary.nextLesson ? (

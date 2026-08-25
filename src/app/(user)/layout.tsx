@@ -77,7 +77,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   const showNav = !isNavHidden(pathname);
 
   return (
-    <div className={showNav ? 'lg:pl-60' : ''}>
+    <div className={showNav ? 'user-shell' : ''}>
       <main className={showNav ? 'min-h-screen pb-28 lg:pb-6' : 'min-h-screen'}>
         {showNav ? (
           /* Desktop: dua kolom — konten utama 640px + rail widget 300px,
