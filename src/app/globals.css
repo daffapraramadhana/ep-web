@@ -806,6 +806,167 @@ body {
   }
 }
 
+/* ============================================================
+   Perjalanan (Journey) — Task 13 brief, mockup v2 `.journey`/`.topic`/
+   `.node`/`.link` + design-system.md §2 "Path node". Pill topic sticky,
+   warna siklus per topic index (brand -> sky -> amber -> pink, di-set
+   inline oleh journey-path.tsx lewat token --brand/--skill-*). Node:
+   64px (done/locked), 78px + pulse ring (now). Konektor 6x26px, hijau
+   hanya bila node SEBELUMNYA berstatus 'done' (sudah dilewati).
+   ============================================================ */
+.journey-topic-pill {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  color: #fff;
+  border-radius: 16px;
+  padding: 11px 16px;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.journey-topic-pill small {
+  font-weight: 800;
+  opacity: 0.75;
+}
+.journey-path {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.journey-link-wrap {
+  width: 78px;
+  display: flex;
+  justify-content: center;
+}
+.journey-link {
+  width: 6px;
+  height: 26px;
+  border-radius: 3px;
+  background: var(--line);
+}
+.journey-link-done {
+  background: var(--good);
+}
+.journey-node-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2px;
+}
+.journey-node-wrap {
+  width: 78px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+.journey-node {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: transform 0.06s;
+}
+.journey-node:active {
+  transform: translateY(2px);
+}
+.journey-node:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.journey-node-done {
+  background: var(--good);
+  color: #fff;
+  border-bottom: 5px solid var(--good-dark);
+}
+.journey-node-now {
+  width: 78px;
+  height: 78px;
+  background: var(--brand);
+  color: #fff;
+  border-bottom: 5px solid var(--brand-dark);
+  animation: journey-pulse 1.6s infinite;
+}
+.journey-node-locked {
+  background: #e5e7eb;
+  color: #9ca3af;
+  border-bottom: 5px solid #d1d5db;
+}
+.journey-node-shake {
+  animation: journey-shake 0.3s;
+}
+.journey-node-info {
+  min-width: 0;
+}
+.journey-node-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.journey-node-sub {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 2px;
+}
+@keyframes journey-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(79, 70, 229, 0);
+  }
+}
+@keyframes journey-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-node-now {
+    animation: none;
+  }
+  .journey-node-shake {
+    animation: none;
+  }
+}
+
+/* Perjalanan — konfirmasi ringan "Ulangi lesson ini?" (tap node done). */
+.journey-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(30, 27, 75, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.journey-confirm-card {
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+}
+
 @media (min-width: 1024px) {
   .user-nav-mobile {
     left: 0;
