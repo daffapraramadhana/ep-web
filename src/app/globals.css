@@ -262,6 +262,15 @@ body {
   font-size: 9px;
   color: #c7d2fe;
 }
+.hero-msg-desktop {
+  display: none;
+}
+.kbd-hint {
+  display: none;
+}
+.hero-next {
+  display: none;
+}
 .hero-msg {
   font-size: 14px;
   font-weight: 800;
@@ -1525,6 +1534,56 @@ body {
   .user-nav-logout:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 2px;
+  }
+  .hero {
+    border-radius: 24px;
+    padding: 28px 32px;
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 28px;
+    align-items: center;
+  }
+  .hero-bottom {
+    margin-top: 0;
+  }
+  .hero-msg-mobile {
+    display: none;
+  }
+  .hero-msg-desktop {
+    display: block;
+    margin-top: 16px;
+  }
+  .hero-next {
+    display: block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #c7d2fe;
+  }
+  .hero-ring-glow {
+    position: relative;
+    transform: scale(1.18);
+    transform-origin: center;
+    margin-right: 8px;
+  }
+  .hero-ring-glow::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.22), transparent 65%);
+    pointer-events: none;
+  }
+  /* Hint keyboard sesi — desktop saja */
+  .kbd-hint {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
   }
   .desktop-rail {
     display: flex;

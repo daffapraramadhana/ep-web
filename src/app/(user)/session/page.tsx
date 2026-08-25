@@ -111,6 +111,26 @@ function SessionBody() {
     submit(answer);
   }
 
+  // Keyboard desktop: Enter = PERIKSA (saat jawaban siap) / LANJUT (saat
+  // sheet feedback terbuka). Enter di dalam input isian sudah ditangani
+  // komponennya sendiri — di-skip di sini supaya tidak dobel.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Enter') return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+      if (phase === 'feedback') {
+        e.preventDefault();
+        next();
+      } else if (phase === 'answering' && answer !== null && !submitting) {
+        e.preventDefault();
+        submit(answer);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase, answer, submitting, submit, next]);
+
   if (phase === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center px-5">
@@ -194,6 +214,10 @@ function SessionBody() {
           >
             {submitError ? 'COBA LAGI' : submitting ? 'MEMERIKSA...' : 'PERIKSA'}
           </ChunkyButton>
+          <span className="kbd-hint" aria-hidden="true">
+            {currentItem.type === 'PILIHAN_GANDA' ? '1–4 pilih · ' : ''}Enter{' '}
+            {phase === 'feedback' ? 'lanjut' : 'periksa'}
+          </span>
         </div>
       ) : null}
 

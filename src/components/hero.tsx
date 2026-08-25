@@ -21,6 +21,8 @@ export interface HeroProps {
   freezeAvailableThisWeek: boolean;
   sessionsCompletedToday: number;
   dailyTarget: number;
+  /** Baris konteks "Berikutnya: ..." — desktop saja (lg). */
+  nextLabel?: string | null;
 }
 
 function greetingWIB(): string {
@@ -31,9 +33,10 @@ function greetingWIB(): string {
       timeZone: 'Asia/Jakarta',
     }).format(new Date()),
   );
-  if (hour < 11) return 'Selamat pagi';
-  if (hour < 15) return 'Selamat siang';
-  if (hour < 19) return 'Selamat sore';
+  // Dini hari (00-03) tetap "malam" — jam 00:54 bukan "pagi".
+  if (hour >= 4 && hour < 11) return 'Selamat pagi';
+  if (hour >= 11 && hour < 15) return 'Selamat siang';
+  if (hour >= 15 && hour < 19) return 'Selamat sore';
   return 'Selamat malam';
 }
 
@@ -58,6 +61,7 @@ export function Hero({
   freezeAvailableThisWeek,
   sessionsCompletedToday,
   dailyTarget,
+  nextLabel,
 }: HeroProps) {
   const target = dailyTarget > 0 ? dailyTarget : 1;
   const pct = (sessionsCompletedToday / target) * 100;
@@ -79,20 +83,34 @@ export function Hero({
           </StatPill>
         ) : null}
       </div>
-      <div className="hero-greet">
-        {greetingWIB()}, {name} 👋
-        <small>Sedikit tiap hari, lama-lama jadi bukit.</small>
-      </div>
-      <div className="hero-bottom">
-        <Ring pct={pct}>
-          <div className="hero-ring-label">
-            <b>
-              {sessionsCompletedToday}/{target}
-            </b>
-            <span>SESI HARI INI</span>
+      {/* Desktop: grid 2 kolom (teks kiri, ring kanan ber-glow) — kartu
+          melayang, radius penuh. Mobile: susunan lama, tak berubah. */}
+      <div className="hero-inner">
+        <div className="hero-text">
+          <div className="hero-greet">
+            {greetingWIB()}, {name} 👋
+            <small>Sedikit tiap hari, lama-lama jadi bukit.</small>
           </div>
-        </Ring>
-        <div className="hero-msg">{statusMessage(sessionsCompletedToday, dailyTarget)}</div>
+          <div className="hero-msg hero-msg-desktop">
+            {statusMessage(sessionsCompletedToday, dailyTarget)}
+          </div>
+          {nextLabel ? <div className="hero-next">Berikutnya: {nextLabel}</div> : null}
+        </div>
+        <div className="hero-bottom">
+          <div className="hero-ring-glow">
+            <Ring pct={pct}>
+              <div className="hero-ring-label">
+                <b>
+                  {sessionsCompletedToday}/{target}
+                </b>
+                <span>SESI HARI INI</span>
+              </div>
+            </Ring>
+          </div>
+          <div className="hero-msg hero-msg-mobile">
+            {statusMessage(sessionsCompletedToday, dailyTarget)}
+          </div>
+        </div>
       </div>
     </div>
   );

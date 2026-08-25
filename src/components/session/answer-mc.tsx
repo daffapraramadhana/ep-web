@@ -37,6 +37,26 @@ export function AnswerMc({ item, disabled, result, onReady }: AnswerMcProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Keyboard desktop: tekan 1-4 untuk memilih opsi (rasa Duolingo web).
+  // Tidak aktif saat disabled (submit berjalan / sheet terbuka) dan tidak
+  // mencuri ketikan dari input/textarea (tak ada di tipe soal ini, tapi
+  // guard tetap dipasang untuk aman).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (disabled) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+      const idx = Number(e.key) - 1;
+      if (idx >= 0 && idx < options.length && idx < LETTERS.length) {
+        e.preventDefault();
+        choose(idx);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, options.length]);
+
   function choose(idx: number) {
     if (disabled) return;
     setSelected(idx);

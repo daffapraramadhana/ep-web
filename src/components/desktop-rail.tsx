@@ -46,7 +46,7 @@ export function DesktopRail() {
 
   return (
     <aside className="desktop-rail" aria-label="Ringkasan belajar">
-      <Card eyebrow="Statistik" title="Minggu berjalan">
+      <Card eyebrow="Sekilas" title="Statistik kamu">
         {summary ? (
           <div className="rail-stats">
             <div className="rail-stat">
@@ -108,8 +108,10 @@ export function DesktopRail() {
               <div className="totals-label">Lesson selesai</div>
             </div>
             <div className="totals-item">
-              <div className="totals-value">{progress.totals.xpTotal}</div>
-              <div className="totals-label">Total XP</div>
+              <div className="totals-value">
+                {progress.skills.reduce((n, sk) => n + sk.answered, 0)}
+              </div>
+              <div className="totals-label">Soal dijawab</div>
             </div>
             <div className="totals-item">
               <div className="totals-value">{progress.totals.longestStreak}</div>

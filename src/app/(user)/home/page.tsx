@@ -86,6 +86,8 @@ export default function HomePage() {
     return null;
   }
 
+  const targetMet = summary.sessionsCompletedToday >= summary.dailyTarget;
+
   return (
     <div>
       <Hero
@@ -95,6 +97,13 @@ export default function HomePage() {
         freezeAvailableThisWeek={summary.freezeAvailableThisWeek}
         sessionsCompletedToday={summary.sessionsCompletedToday}
         dailyTarget={summary.dailyTarget}
+        nextLabel={
+          summary.nextLesson
+            ? `${summary.nextLesson.title} · ±${summary.nextLesson.estMinutes} mnt`
+            : summary.contentExhausted
+              ? 'Sesi Penguatan'
+              : null
+        }
       />
 
       <div className="home-body space-y-3.5 px-5 pt-[18px] pb-6">
@@ -107,9 +116,18 @@ export default function HomePage() {
               <MetaChip tone="amber">±{summary.nextLesson.estMinutes} mnt</MetaChip>
               <MetaChip tone="amber">+{summary.nextLesson.xpEstimate} XP</MetaChip>
             </div>
-            <ChunkyButton onClick={startSession} disabled={starting}>
+            <ChunkyButton
+              variant={targetMet ? 'ghost' : 'brand'}
+              onClick={startSession}
+              disabled={starting}
+            >
               {starting ? 'MEMUAT...' : 'MULAI'}
             </ChunkyButton>
+            {targetMet ? (
+              <p className="mt-2 text-center text-xs font-bold text-muted">
+                Sesi tambahan = XP ekstra
+              </p>
+            ) : null}
           </Card>
         ) : summary.contentExhausted ? (
           <Card eyebrow="Penguatan" title="Sesi Penguatan">
@@ -117,9 +135,18 @@ export default function HomePage() {
               Kamu sudah menyelesaikan semua materi di levelmu. Yuk perkuat lagi soal-soal yang
               pernah kamu lewati.
             </p>
-            <ChunkyButton onClick={startSession} disabled={starting}>
+            <ChunkyButton
+              variant={targetMet ? 'ghost' : 'brand'}
+              onClick={startSession}
+              disabled={starting}
+            >
               {starting ? 'MEMUAT...' : 'MULAI'}
             </ChunkyButton>
+            {targetMet ? (
+              <p className="mt-2 text-center text-xs font-bold text-muted">
+                Sesi tambahan = XP ekstra
+              </p>
+            ) : null}
           </Card>
         ) : null}
 
