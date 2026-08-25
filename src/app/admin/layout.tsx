@@ -3,7 +3,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Upload, Table2, Image as ImageIcon, Users, Gauge, Flag, LogOut } from 'lucide-react';
+import {
+  Upload,
+  Table2,
+  Image as ImageIcon,
+  Users,
+  UserPlus,
+  Gauge,
+  Flag,
+  LogOut,
+} from 'lucide-react';
 import type { ComponentType } from 'react';
 
 interface NavItem {
@@ -32,7 +41,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: 'Import Soal', href: '/admin/import', icon: Upload },
       { label: 'Soal & Lesson', href: '/admin/content', icon: Table2 },
       { label: 'Media', href: '/admin/media', icon: ImageIcon },
-      { label: 'Undang Karyawan', href: '/admin/users', icon: Users },
+      { label: 'Undang Karyawan', href: '/admin/users', icon: UserPlus },
     ],
   },
 ];

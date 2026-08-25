@@ -27,6 +27,13 @@ const PLOT_H = HEIGHT - PAD_TOP - PAD_BOTTOM;
  * (design-system.md §6 "grafik per-departemen ... lib chart baru DITOLAK").
  * Deret selalu 28 titik (0 termasuk, brief §5) — jendela nilai konstan
  * (min 1) mencegah pembagian NaN saat semua nilai 0 (garis rata di dasar).
+ *
+ * viewBox 700x160 + preserveAspectRatio="none" dipertahankan HANYA untuk
+ * area/line/gridline (garis lurus, tidak masalah di-stretch non-uniform).
+ * Teks tanggal, titik hover, dan tooltip dipindah ke overlay HTML posisi
+ * absolut berbasis persentase (x/WIDTH, y/HEIGHT — matematika yang sama
+ * dengan sebelumnya) — supaya tidak ikut ter-skew (teks miring, titik jadi
+ * elips) saat SVG dirender lebih lebar dari 700px asli.
  */
 export function ActivityChart({ series }: ActivityChartProps) {
   const [hover, setHover] = useState<number | null>(null);
@@ -73,38 +80,44 @@ export function ActivityChart({ series }: ActivityChartProps) {
         })}
         <path d={areaPath} className="activity-chart-area" />
         <path d={linePath} className="activity-chart-line" />
-        {points.map((p, i) => (
-          <g key={p.date}>
-            {i % 7 === 0 && (
-              <text
-                x={p.x}
-                y={HEIGHT - 6}
-                textAnchor={i === 0 ? 'start' : 'middle'}
-                className="activity-chart-axis-label"
-              >
-                {formatDateLabel(p.date)}
-              </text>
-            )}
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={4}
-              className="activity-chart-dot"
-              style={{ opacity: hover === i ? 1 : 0 }}
-            />
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={10}
-              fill="transparent"
-              onMouseEnter={() => setHover(i)}
-              onMouseLeave={() => setHover(null)}
-            >
-              <title>{`${p.sessionsCompleted} sesi · ${formatDateLabel(p.date)}`}</title>
-            </circle>
-          </g>
-        ))}
       </svg>
+
+      <div className="activity-chart-overlay">
+        {points.map((p, i) => {
+          // Setiap 7 hari + titik terakhir (hari ini) — brief §5 minta tanggal
+          // "hari ini" selalu tampak, bukan cuma kelipatan 7 dari titik 0.
+          const showLabel = i % 7 === 0 || i === n - 1;
+          const leftPct = (p.x / WIDTH) * 100;
+          const topPct = (p.y / HEIGHT) * 100;
+          const labelTransform =
+            i === 0 ? 'translateX(0)' : i === n - 1 ? 'translateX(-100%)' : 'translateX(-50%)';
+          return (
+            <div key={p.date}>
+              {showLabel && (
+                <span
+                  className="activity-chart-axis-label-html"
+                  style={{ left: `${leftPct}%`, transform: labelTransform }}
+                >
+                  {formatDateLabel(p.date)}
+                </span>
+              )}
+              <div
+                className="activity-chart-hit"
+                style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+                onMouseEnter={() => setHover(i)}
+                onMouseLeave={() => setHover(null)}
+                title={`${p.sessionsCompleted} sesi · ${formatDateLabel(p.date)}`}
+              >
+                <span
+                  className="activity-chart-dot-html"
+                  style={{ opacity: hover === i ? 1 : 0 }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       {hovered && (
         <div
           className="activity-chart-tooltip"

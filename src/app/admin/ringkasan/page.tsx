@@ -59,7 +59,11 @@ export default function RingkasanPage() {
         <>
           <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             <StatCard label="Karyawan" value={data.totals.employees} />
-            <StatCard label="Aktif" value={data.totals.active} />
+            <StatCard
+              label="Aktif"
+              value={data.totals.active}
+              caption="≥1 sesi dalam 7 hari — bisa tumpang tindih status lain"
+            />
             <StatCard label="On-track" value={data.totals.onTrack} />
             <StatCard
               label="Butuh Perhatian"
@@ -146,15 +150,18 @@ function StatCard({
   value,
   amber,
   href,
+  caption,
 }: {
   label: string;
   value: number;
   amber?: boolean;
   href?: string;
+  caption?: string;
 }) {
   const card = (
     <Card eyebrow={label} className={amber ? 'admin-stat-card-amber' : undefined}>
       <div className="admin-stat-value">{value}</div>
+      {caption && <p className="mt-1 text-[11px] text-muted">{caption}</p>}
     </Card>
   );
   if (href) {
