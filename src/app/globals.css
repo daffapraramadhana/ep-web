@@ -967,6 +967,212 @@ body {
   text-align: center;
 }
 
+/* ============================================================
+   Progress (Task 14) — design-system.md §2 "Bar skill" + §5 (ikon
+   skill) + §7 (kontras). Baris skill warna penuh via token --skill-*
+   (inline style di page.tsx, konsisten dgn TOPIC_PILL_COLORS di
+   journey-path.tsx). Teks putih default; `.skill-row-amber` (Listening)
+   memakai teks/ikon gelap #B45309 karena --skill-listening = --warn
+   amber dan putih-di-atas-amber gagal kontras (§7, pola sama dengan
+   .meta-chip-amber yang sudah ada).
+   ============================================================ */
+.skill-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: #fff;
+}
+.skill-row-amber {
+  color: #b45309;
+}
+.skill-row-empty {
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+}
+.skill-row-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+.skill-row-amber .skill-row-icon {
+  background: rgba(255, 255, 255, 0.6);
+  color: #b45309;
+}
+.skill-row-empty .skill-row-icon {
+  background: #fff;
+  color: var(--muted);
+}
+.skill-row-info {
+  flex: 1;
+  min-width: 0;
+}
+.skill-row-title {
+  font-size: 15px;
+  font-weight: 900;
+}
+.skill-row-sub {
+  font-size: 12.5px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+.skill-row-empty .skill-row-sub {
+  opacity: 1;
+}
+.skill-ring-track {
+  stroke: rgba(255, 255, 255, 0.3);
+}
+.skill-ring-arc {
+  stroke: #fff;
+}
+.skill-ring-track-amber {
+  stroke: rgba(180, 83, 9, 0.2);
+}
+.skill-ring-arc-amber {
+  stroke: #b45309;
+}
+.skill-ring-pct {
+  font-size: 12.5px;
+  font-weight: 900;
+  color: inherit;
+}
+
+/* Progress — kartu Minggu Ini (7 hari Senin->Minggu, emoji dipertahankan
+   sesuai aturan kalender streak §5). */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 2px;
+  border-radius: 12px;
+  background: var(--bg);
+}
+.week-day-active {
+  background: var(--warn-soft);
+}
+.week-day-frozen {
+  background: #e0f2fe;
+}
+.week-day-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.week-day-emoji {
+  font-size: 18px;
+  line-height: 1;
+}
+.week-legend {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Progress — kartu ringkas total. */
+.totals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+.totals-value {
+  font-size: 21px;
+  font-weight: 900;
+  color: var(--brand);
+}
+.totals-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--muted);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* ============================================================
+   Profil (Task 14) — nama/email read-only + toggle bunyi.
+   ============================================================ */
+.profile-field {
+  padding: 9px 0;
+}
+.profile-field + .profile-field {
+  border-top: 1.5px solid var(--line);
+}
+.profile-field-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.profile-field-value {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-top: 2px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.toggle-switch {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--line);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.toggle-switch-on {
+  background: var(--brand);
+}
+.toggle-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+.toggle-switch-on .toggle-switch-knob {
+  transform: translateX(20px);
+}
+.toggle-switch:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.toggle-switch:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 @media (min-width: 1024px) {
   .user-nav-mobile {
     left: 0;
