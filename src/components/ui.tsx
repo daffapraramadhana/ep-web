@@ -90,6 +90,33 @@ export interface MetaChipProps extends HTMLAttributes<HTMLDivElement> {
   tone?: 'brand' | 'amber';
 }
 
+/**
+ * Pill status admin (design-system.md §6): DRAFT abu, LIVE hijau-soft,
+ * RETIRED merah-soft. Kelas `.status-pill*` didefinisikan di globals.css,
+ * khusus dipakai di /admin (tabel lesson & item soal).
+ */
+export type StatusPillStatus = 'DRAFT' | 'LIVE' | 'RETIRED';
+
+const STATUS_PILL_CLASS: Record<StatusPillStatus, string> = {
+  DRAFT: 'status-pill-draft',
+  LIVE: 'status-pill-live',
+  RETIRED: 'status-pill-retired',
+};
+
+export interface StatusPillProps extends HTMLAttributes<HTMLSpanElement> {
+  status: StatusPillStatus | string;
+}
+
+export function StatusPill({ status, className, ...props }: StatusPillProps) {
+  const variant = STATUS_PILL_CLASS[status as StatusPillStatus] ?? 'status-pill-draft';
+  const classes = ['status-pill', variant, className].filter(Boolean).join(' ');
+  return (
+    <span className={classes} {...props}>
+      {status}
+    </span>
+  );
+}
+
 export function MetaChip({
   tone = 'brand',
   className,

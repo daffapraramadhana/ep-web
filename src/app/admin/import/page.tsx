@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { downloadCsv } from '@/lib/csv';
+import { Card, ChunkyButton } from '@/components/ui';
 
 interface ImportError {
   row: number;
@@ -61,28 +62,24 @@ export default function ImportSoalPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Import Soal</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-black text-ink">Import Soal</h1>
+      <p className="mb-6 text-sm font-semibold text-muted">
         Unggah berkas .xlsx berisi lesson dan item soal untuk diimpor ke sistem.
       </p>
 
-      <form onSubmit={handleSubmit} className="mb-6 flex items-center gap-3">
+      <form onSubmit={handleSubmit} className="mb-6 max-w-sm space-y-3">
         <input
           ref={fileInputRef}
           type="file"
           accept=".xlsx"
-          className="block text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200"
+          className="block text-sm font-semibold text-ink file:mr-3 file:rounded-xl file:border-0 file:bg-brand-soft file:px-3 file:py-2 file:text-sm file:font-extrabold file:text-brand-dark hover:file:bg-line"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-        >
+        <ChunkyButton type="submit" disabled={loading}>
           {loading ? 'Mengunggah...' : 'Unggah & Import'}
-        </button>
+        </ChunkyButton>
       </form>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm font-semibold text-bad">{error}</p>}
 
       {result && (
         <div className="space-y-6">
@@ -98,29 +95,26 @@ export default function ImportSoalPage() {
           {result.errors.length > 0 && (
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-gray-900">Daftar Error</h2>
-                <button
-                  onClick={handleDownloadErrors}
-                  className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
+                <h2 className="text-sm font-black text-ink">Daftar Error</h2>
+                <button type="button" onClick={handleDownloadErrors} className="btn-outline-sm">
                   Unduh laporan error (CSV)
                 </button>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200 text-sm">
-                  <thead className="bg-gray-50">
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead>
                     <tr>
-                      <th className="px-3 py-2 text-left font-medium text-gray-500">Baris</th>
-                      <th className="px-3 py-2 text-left font-medium text-gray-500">Kolom</th>
-                      <th className="px-3 py-2 text-left font-medium text-gray-500">Pesan</th>
+                      <th>Baris</th>
+                      <th>Kolom</th>
+                      <th>Pesan</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody>
                     {result.errors.map((e, i) => (
                       <tr key={i}>
-                        <td className="px-3 py-2 text-red-600">{e.row}</td>
-                        <td className="px-3 py-2 text-red-600">{e.column}</td>
-                        <td className="px-3 py-2 text-red-600">{e.message}</td>
+                        <td className="text-bad">{e.row}</td>
+                        <td className="text-bad">{e.column}</td>
+                        <td className="text-bad">{e.message}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -135,10 +129,5 @@ export default function ImportSoalPage() {
 }
 
 function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-gray-900">{value}</p>
-    </div>
-  );
+  return <Card eyebrow={label} title={value} />;
 }

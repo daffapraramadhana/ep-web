@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { ChunkyButton, StatusPill } from '@/components/ui';
 
 type ItemType = 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT';
 type ItemStatus = 'DRAFT' | 'LIVE' | 'RETIRED';
@@ -48,12 +49,6 @@ interface FormState {
   mediaFile: string;
   passage: string;
 }
-
-const STATUS_BADGE: Record<string, string> = {
-  DRAFT: 'bg-gray-100 text-gray-700',
-  LIVE: 'bg-green-100 text-green-700',
-  RETIRED: 'bg-red-100 text-red-700',
-};
 
 function truncate(s: string, n: number) {
   return s.length > n ? `${s.slice(0, n)}…` : s;
@@ -221,35 +216,35 @@ export default function LessonDetailPage() {
 
   return (
     <div className="max-w-4xl">
-      <Link href="/admin/content" className="mb-3 inline-block text-sm text-blue-600 hover:underline">
+      <Link href="/admin/content" className="mb-3 inline-block text-sm font-bold text-brand hover:underline">
         ← Kembali ke daftar lesson
       </Link>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">
+      <h1 className="mb-1 text-xl font-black text-ink">
         {lesson ? `${lesson.code} — ${lesson.title}` : 'Detail Lesson'}
       </h1>
       {lesson && (
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-6 text-sm font-semibold text-muted">
           {lesson.topic} · {lesson.level}/{lesson.cefr} · {lesson.skill}
         </p>
       )}
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm font-semibold text-bad">{error}</p>}
 
-      <div className="mb-6 overflow-hidden rounded-lg border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+      <div className="admin-table-wrap mb-6">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Urutan</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Prompt</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Tipe</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Status</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Aksi</th>
+              <th>Urutan</th>
+              <th>Prompt</th>
+              <th>Tipe</th>
+              <th>Status</th>
+              <th>Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {items.length === 0 && !loading && (
               <tr>
-                <td colSpan={5} className="px-3 py-4 text-center text-gray-400">
+                <td colSpan={5} className="text-center text-muted">
                   Belum ada soal.
                 </td>
               </tr>
@@ -258,23 +253,17 @@ export default function LessonDetailPage() {
               <tr
                 key={item.id}
                 onClick={() => handleSelect(item)}
-                className={`cursor-pointer hover:bg-gray-50 ${
-                  selectedId === item.id ? 'bg-blue-50' : ''
+                className={`admin-table-row-clickable${
+                  selectedId === item.id ? ' admin-table-row-selected' : ''
                 }`}
               >
-                <td className="px-3 py-2 text-gray-700">{item.order}</td>
-                <td className="px-3 py-2 text-gray-900">{truncate(item.prompt, 80)}</td>
-                <td className="px-3 py-2 text-gray-700">{item.type}</td>
-                <td className="px-3 py-2">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      STATUS_BADGE[item.status] ?? 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {item.status}
-                  </span>
+                <td className="text-muted">{item.order}</td>
+                <td>{truncate(item.prompt, 80)}</td>
+                <td className="text-muted">{item.type}</td>
+                <td>
+                  <StatusPill status={item.status} />
                 </td>
-                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                <td onClick={(e) => e.stopPropagation()}>
                   <ItemActions
                     item={item}
                     pending={pendingStatusId === item.id}
@@ -288,8 +277,8 @@ export default function LessonDetailPage() {
       </div>
 
       {selectedItem && form && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <h2 className="mb-4 text-sm font-semibold text-gray-900">
+        <div className="card">
+          <h2 className="mb-4 text-sm font-black text-ink">
             Edit Soal — urutan {selectedItem.order} ({selectedItem.type})
           </h2>
 
@@ -299,13 +288,15 @@ export default function LessonDetailPage() {
                 value={form.prompt}
                 onChange={(e) => setForm({ ...form, prompt: e.target.value })}
                 rows={2}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
               />
             </Field>
 
             {selectedItem.type === 'PILIHAN_GANDA' && (
               <div className="space-y-2">
-                <p className="text-xs font-medium text-gray-500">Opsi & Kunci Jawaban</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-muted">
+                  Opsi & Kunci Jawaban
+                </p>
                 {(['A', 'B', 'C', 'D'] as const).map((letter) => {
                   const key = (`option${letter}` as 'optionA' | 'optionB' | 'optionC' | 'optionD');
                   return (
@@ -316,12 +307,12 @@ export default function LessonDetailPage() {
                         checked={form.answerKey === letter}
                         onChange={() => setForm({ ...form, answerKey: letter })}
                       />
-                      <span className="w-5 text-sm font-medium text-gray-700">{letter}</span>
+                      <span className="w-5 text-sm font-bold text-ink">{letter}</span>
                       <input
                         type="text"
                         value={form[key]}
                         onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                        className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+                        className="flex-1 rounded-xl border border-line px-3 py-1.5 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
                       />
                     </div>
                   );
@@ -336,7 +327,7 @@ export default function LessonDetailPage() {
                     type="text"
                     value={form.answerKey}
                     onChange={(e) => setForm({ ...form, answerKey: e.target.value })}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
                   />
                 </Field>
                 <Field label="Jawaban lain yang diterima (pisahkan dengan ;)">
@@ -344,7 +335,7 @@ export default function LessonDetailPage() {
                     value={form.acceptedAnswers}
                     onChange={(e) => setForm({ ...form, acceptedAnswers: e.target.value })}
                     rows={2}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
                   />
                 </Field>
               </>
@@ -356,7 +347,7 @@ export default function LessonDetailPage() {
                   type="text"
                   value={form.answerKey}
                   onChange={(e) => setForm({ ...form, answerKey: e.target.value })}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
                 />
               </Field>
             )}
@@ -366,7 +357,7 @@ export default function LessonDetailPage() {
                 value={form.explanation}
                 onChange={(e) => setForm({ ...form, explanation: e.target.value })}
                 rows={2}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
               />
             </Field>
 
@@ -375,7 +366,7 @@ export default function LessonDetailPage() {
                 type="text"
                 value={form.mediaFile}
                 onChange={(e) => setForm({ ...form, mediaFile: e.target.value })}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
               />
             </Field>
 
@@ -384,28 +375,21 @@ export default function LessonDetailPage() {
                 value={form.passage}
                 onChange={(e) => setForm({ ...form, passage: e.target.value })}
                 rows={3}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
               />
             </Field>
           </div>
 
-          {saveError && <p className="mt-4 text-sm text-red-600">{saveError}</p>}
+          {saveError && <p className="mt-4 text-sm font-semibold text-bad">{saveError}</p>}
           {saveSuccess && !saveError && (
-            <p className="mt-4 text-sm text-green-600">Tersimpan.</p>
+            <p className="mt-4 text-sm font-semibold text-good-dark">Tersimpan.</p>
           )}
 
           <div className="mt-4 flex items-center gap-3">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-            >
+            <ChunkyButton type="button" onClick={handleSave} disabled={saving} className="max-w-xs">
               {saving ? 'Menyimpan...' : 'Simpan'}
-            </button>
-            <button
-              onClick={() => setSelectedId('')}
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
+            </ChunkyButton>
+            <button type="button" onClick={() => setSelectedId('')} className="btn-outline-sm">
               Tutup
             </button>
           </div>
@@ -418,7 +402,9 @@ export default function LessonDetailPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1 block text-xs font-medium text-gray-500">{label}</label>
+      <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-muted">
+        {label}
+      </label>
       {children}
     </div>
   );
@@ -433,41 +419,31 @@ function ItemActions({
   pending: boolean;
   onTransition: (item: ItemRow, next: string) => void;
 }) {
-  const buttons: { label: string; next: string; className: string }[] = [];
+  const buttons: { label: string; next: string; variant: 'good' | 'ghost' | 'danger' }[] = [];
   if (item.status === 'DRAFT') {
-    buttons.push({
-      label: 'Terbitkan',
-      next: 'LIVE',
-      className: 'border-green-300 text-green-700 hover:bg-green-50',
-    });
+    buttons.push({ label: 'Terbitkan', next: 'LIVE', variant: 'good' });
   } else if (item.status === 'LIVE') {
-    buttons.push({
-      label: 'Tarik',
-      next: 'DRAFT',
-      className: 'border-gray-300 text-gray-700 hover:bg-gray-50',
-    });
-    buttons.push({
-      label: 'Pensiunkan',
-      next: 'RETIRED',
-      className: 'border-red-300 text-red-700 hover:bg-red-50',
-    });
+    buttons.push({ label: 'Tarik', next: 'DRAFT', variant: 'ghost' });
+    buttons.push({ label: 'Pensiunkan', next: 'RETIRED', variant: 'danger' });
   }
 
   if (buttons.length === 0) {
-    return <span className="text-xs text-gray-400">-</span>;
+    return <span className="text-xs text-muted">-</span>;
   }
 
   return (
     <div className="flex gap-2">
       {buttons.map((b) => (
-        <button
+        <ChunkyButton
           key={b.next}
+          type="button"
+          variant={b.variant}
           disabled={pending}
+          className="btn-sm"
           onClick={() => onTransition(item, b.next)}
-          className={`rounded-md border px-2 py-1 text-xs font-medium disabled:opacity-60 ${b.className}`}
         >
           {pending ? '...' : b.label}
-        </button>
+        </ChunkyButton>
       ))}
     </div>
   );

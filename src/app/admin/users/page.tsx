@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { downloadCsv } from '@/lib/csv';
+import { Card, ChunkyButton } from '@/components/ui';
 
 interface ImportUserError {
   row: number;
@@ -108,28 +109,24 @@ export default function UsersPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Karyawan</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-black text-ink">Karyawan</h1>
+      <p className="mb-6 text-sm font-semibold text-muted">
         Unggah berkas CSV (kolom: nama, email) untuk membuat akun dan mengirim undangan.
       </p>
 
-      <form onSubmit={handleSubmit} className="mb-6 flex items-center gap-3">
+      <form onSubmit={handleSubmit} className="mb-6 max-w-sm space-y-3">
         <input
           ref={fileInputRef}
           type="file"
           accept=".csv"
-          className="block text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200"
+          className="block text-sm font-semibold text-ink file:mr-3 file:rounded-xl file:border-0 file:bg-brand-soft file:px-3 file:py-2 file:text-sm file:font-extrabold file:text-brand-dark hover:file:bg-line"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-        >
+        <ChunkyButton type="submit" disabled={loading}>
           {loading ? 'Mengunggah...' : 'Unggah & Import'}
-        </button>
+        </ChunkyButton>
       </form>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm font-semibold text-bad">{error}</p>}
 
       {result && (
         <div className="mb-8 space-y-4">
@@ -140,19 +137,19 @@ export default function UsersPage() {
           </div>
 
           {result.errors.length > 0 && (
-            <div className="overflow-hidden rounded-lg border border-gray-200">
-              <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead className="bg-gray-50">
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
                   <tr>
-                    <th className="px-3 py-2 text-left font-medium text-gray-500">Baris</th>
-                    <th className="px-3 py-2 text-left font-medium text-gray-500">Pesan</th>
+                    <th>Baris</th>
+                    <th>Pesan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                   {result.errors.map((e, i) => (
                     <tr key={i}>
-                      <td className="px-3 py-2 text-red-600">{e.row}</td>
-                      <td className="px-3 py-2 text-red-600">{e.message}</td>
+                      <td className="text-bad">{e.row}</td>
+                      <td className="text-bad">{e.message}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -163,34 +160,32 @@ export default function UsersPage() {
           {result.invites.length > 0 && (
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-gray-900">Link Undangan</h2>
-                <button
-                  onClick={handleDownloadInvites}
-                  className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
+                <h2 className="text-sm font-black text-ink">Link Undangan</h2>
+                <button type="button" onClick={handleDownloadInvites} className="btn-outline-sm">
                   Unduh semua link undangan (CSV)
                 </button>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200 text-sm">
-                  <thead className="bg-gray-50">
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead>
                     <tr>
-                      <th className="px-3 py-2 text-left font-medium text-gray-500">Nama</th>
-                      <th className="px-3 py-2 text-left font-medium text-gray-500">Email</th>
-                      <th className="px-3 py-2 text-left font-medium text-gray-500">Link Undangan</th>
-                      <th className="px-3 py-2 text-left font-medium text-gray-500"></th>
+                      <th>Nama</th>
+                      <th>Email</th>
+                      <th>Link Undangan</th>
+                      <th></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody>
                     {result.invites.map((inv) => (
                       <tr key={inv.email}>
-                        <td className="px-3 py-2 text-gray-900">{inv.name}</td>
-                        <td className="px-3 py-2 text-gray-700">{inv.email}</td>
-                        <td className="max-w-xs truncate px-3 py-2 text-gray-500">{inv.inviteUrl}</td>
-                        <td className="px-3 py-2">
+                        <td>{inv.name}</td>
+                        <td>{inv.email}</td>
+                        <td className="max-w-xs truncate text-muted">{inv.inviteUrl}</td>
+                        <td>
                           <button
+                            type="button"
                             onClick={() => handleCopyLink(inv.inviteUrl, inv.email)}
-                            className="rounded-md border border-gray-300 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                            className="btn-outline-sm"
                           >
                             {copiedEmail === inv.email ? 'Tersalin' : 'Salin link'}
                           </button>
@@ -206,40 +201,36 @@ export default function UsersPage() {
       )}
 
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-gray-900">Daftar Karyawan</h2>
-        <button
-          onClick={loadUsers}
-          disabled={listLoading}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
-        >
+        <h2 className="text-sm font-black text-ink">Daftar Karyawan</h2>
+        <button type="button" onClick={loadUsers} disabled={listLoading} className="btn-outline-sm">
           {listLoading ? 'Memuat...' : 'Muat ulang'}
         </button>
       </div>
 
-      {listError && <p className="mb-4 text-sm text-red-600">{listError}</p>}
+      {listError && <p className="mb-4 text-sm font-semibold text-bad">{listError}</p>}
 
-      <div className="overflow-hidden rounded-lg border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Nama</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Email</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Status Undangan</th>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Status Undangan</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {users.length === 0 && !listLoading && (
               <tr>
-                <td colSpan={3} className="px-3 py-4 text-center text-gray-400">
+                <td colSpan={3} className="text-center text-muted">
                   Belum ada karyawan.
                 </td>
               </tr>
             )}
             {users.map((u) => (
               <tr key={u.id}>
-                <td className="px-3 py-2 text-gray-900">{u.name}</td>
-                <td className="px-3 py-2 text-gray-700">{u.email}</td>
-                <td className="px-3 py-2 text-gray-700">{u.inviteStatus}</td>
+                <td>{u.name}</td>
+                <td className="text-muted">{u.email}</td>
+                <td className="text-muted">{u.inviteStatus}</td>
               </tr>
             ))}
           </tbody>
@@ -250,10 +241,5 @@ export default function UsersPage() {
 }
 
 function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-gray-900">{value}</p>
-    </div>
-  );
+  return <Card eyebrow={label} title={value} />;
 }

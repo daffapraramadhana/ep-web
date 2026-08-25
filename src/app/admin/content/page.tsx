@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { ChunkyButton, StatusPill } from '@/components/ui';
 
 interface LessonListItem {
   id: string;
@@ -20,12 +21,6 @@ interface LessonListItem {
 
 const LEVELS = ['DASAR', 'MENENGAH', 'MAHIR'];
 const STATUSES = ['DRAFT', 'LIVE', 'RETIRED'];
-
-const STATUS_BADGE: Record<string, string> = {
-  DRAFT: 'bg-gray-100 text-gray-700',
-  LIVE: 'bg-green-100 text-green-700',
-  RETIRED: 'bg-red-100 text-red-700',
-};
 
 export default function ContentPage() {
   const router = useRouter();
@@ -78,8 +73,8 @@ export default function ContentPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Soal & Lesson</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-black text-ink">Soal & Lesson</h1>
+      <p className="mb-6 text-sm font-semibold text-muted">
         Kelola lesson, lihat jumlah soal, dan atur status penerbitan.
       </p>
 
@@ -87,7 +82,7 @@ export default function ContentPage() {
         <select
           value={level}
           onChange={(e) => setLevel(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700"
+          className="rounded-xl border border-line px-3 py-1.5 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
         >
           <option value="">Semua level</option>
           {LEVELS.map((l) => (
@@ -99,7 +94,7 @@ export default function ContentPage() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700"
+          className="rounded-xl border border-line px-3 py-1.5 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
         >
           <option value="">Semua status</option>
           {STATUSES.map((s) => (
@@ -108,35 +103,31 @@ export default function ContentPage() {
             </option>
           ))}
         </select>
-        <button
-          onClick={load}
-          disabled={loading}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
-        >
+        <button type="button" onClick={load} disabled={loading} className="btn-outline-sm">
           {loading ? 'Memuat...' : 'Muat ulang'}
         </button>
       </div>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm font-semibold text-bad">{error}</p>}
 
-      <div className="overflow-hidden rounded-lg border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Kode</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Judul</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Topic</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Level/CEFR</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Skill</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Jumlah Soal</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Status</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">Aksi</th>
+              <th>Kode</th>
+              <th>Judul</th>
+              <th>Topic</th>
+              <th>Level/CEFR</th>
+              <th>Skill</th>
+              <th>Jumlah Soal</th>
+              <th>Status</th>
+              <th>Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {lessons.length === 0 && !loading && (
               <tr>
-                <td colSpan={8} className="px-3 py-4 text-center text-gray-400">
+                <td colSpan={8} className="text-center text-muted">
                   Belum ada lesson.
                 </td>
               </tr>
@@ -145,28 +136,22 @@ export default function ContentPage() {
               <tr
                 key={l.id}
                 onClick={() => router.push(`/admin/content/${l.id}`)}
-                className="cursor-pointer hover:bg-gray-50"
+                className="admin-table-row-clickable"
               >
-                <td className="px-3 py-2 font-medium text-gray-900">{l.code}</td>
-                <td className="px-3 py-2 text-gray-900">{l.title}</td>
-                <td className="px-3 py-2 text-gray-700">{l.topic}</td>
-                <td className="px-3 py-2 text-gray-700">
+                <td className="font-bold">{l.code}</td>
+                <td>{l.title}</td>
+                <td className="text-muted">{l.topic}</td>
+                <td className="text-muted">
                   {l.level} / {l.cefr}
                 </td>
-                <td className="px-3 py-2 text-gray-700">{l.skill}</td>
-                <td className="px-3 py-2 text-gray-700">
+                <td className="text-muted">{l.skill}</td>
+                <td className="text-muted">
                   {l.liveItemCount}/{l.itemCount}
                 </td>
-                <td className="px-3 py-2">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      STATUS_BADGE[l.status] ?? 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {l.status}
-                  </span>
+                <td>
+                  <StatusPill status={l.status} />
                 </td>
-                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                <td onClick={(e) => e.stopPropagation()}>
                   <LessonActions
                     lesson={l}
                     pending={pendingId === l.id}
@@ -191,41 +176,31 @@ function LessonActions({
   pending: boolean;
   onTransition: (lesson: LessonListItem, next: string) => void;
 }) {
-  const buttons: { label: string; next: string; className: string }[] = [];
+  const buttons: { label: string; next: string; variant: 'good' | 'ghost' | 'danger' }[] = [];
   if (lesson.status === 'DRAFT') {
-    buttons.push({
-      label: 'Terbitkan',
-      next: 'LIVE',
-      className: 'border-green-300 text-green-700 hover:bg-green-50',
-    });
+    buttons.push({ label: 'Terbitkan', next: 'LIVE', variant: 'good' });
   } else if (lesson.status === 'LIVE') {
-    buttons.push({
-      label: 'Tarik',
-      next: 'DRAFT',
-      className: 'border-gray-300 text-gray-700 hover:bg-gray-50',
-    });
-    buttons.push({
-      label: 'Pensiunkan',
-      next: 'RETIRED',
-      className: 'border-red-300 text-red-700 hover:bg-red-50',
-    });
+    buttons.push({ label: 'Tarik', next: 'DRAFT', variant: 'ghost' });
+    buttons.push({ label: 'Pensiunkan', next: 'RETIRED', variant: 'danger' });
   }
 
   if (buttons.length === 0) {
-    return <span className="text-xs text-gray-400">-</span>;
+    return <span className="text-xs text-muted">-</span>;
   }
 
   return (
     <div className="flex gap-2">
       {buttons.map((b) => (
-        <button
+        <ChunkyButton
           key={b.next}
+          type="button"
+          variant={b.variant}
           disabled={pending}
+          className="btn-sm"
           onClick={() => onTransition(lesson, b.next)}
-          className={`rounded-md border px-2 py-1 text-xs font-medium disabled:opacity-60 ${b.className}`}
         >
           {pending ? '...' : b.label}
-        </button>
+        </ChunkyButton>
       ))}
     </div>
   );

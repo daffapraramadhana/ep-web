@@ -3,12 +3,20 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { Upload, Table2, Image as ImageIcon, Users, LogOut } from 'lucide-react';
+import type { ComponentType } from 'react';
 
-const NAV_ITEMS = [
-  { label: 'Import Soal', href: '/admin/import' },
-  { label: 'Soal & Lesson', href: '/admin/content' },
-  { label: 'Media', href: '/admin/media' },
-  { label: 'Karyawan', href: '/admin/users' },
+interface NavItem {
+  label: string;
+  href: string;
+  icon: ComponentType<{ size?: number; strokeWidth?: number }>;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { label: 'Import Soal', href: '/admin/import', icon: Upload },
+  { label: 'Soal & Lesson', href: '/admin/content', icon: Table2 },
+  { label: 'Media', href: '/admin/media', icon: ImageIcon },
+  { label: 'Karyawan', href: '/admin/users', icon: Users },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -59,27 +67,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="flex w-56 flex-col border-r border-gray-200 bg-gray-50 p-4">
-        <nav className="flex-1 space-y-1">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="block rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-200"
-            >
-              {item.label}
-            </Link>
-          ))}
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-brand">Admin</div>
+        <nav className="admin-nav">
+          {NAV_ITEMS.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                className={`admin-nav-item${active ? ' admin-nav-item-active' : ''}`}
+              >
+                <Icon size={20} strokeWidth={2.25} />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
-        <button
-          onClick={handleLogout}
-          className="mt-6 w-full rounded-md px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
-        >
+        <button type="button" onClick={handleLogout} className="admin-logout">
+          <LogOut size={20} strokeWidth={2.25} />
           Keluar
         </button>
       </aside>
-      <main className="flex-1 p-6">{children}</main>
+      <main className="admin-main">{children}</main>
     </div>
   );
 }
