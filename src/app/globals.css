@@ -1313,6 +1313,12 @@ body {
 }
 .admin-main {
   flex: 1;
+  /* Task 6 768px spot-check: tanpa ini flex item menolak menyusut di
+     bawah lebar intrinsik kontennya (default flex `min-width: auto`),
+     jadi tabel lebar (mis. Karyawan 7 kolom, Laporan) mendorong seluruh
+     .admin-shell melebar dan HALAMAN ikut scroll horizontal — bukan cuma
+     .admin-table-wrap yang seharusnya scroll sendiri. */
+  min-width: 0;
   padding: 28px 32px;
 }
 
@@ -1322,6 +1328,14 @@ body {
   border: 1.5px solid var(--line);
   border-radius: 18px;
   background: #fff;
+  /* Task 6 768px spot-check: `.admin-sidebar` di sebelahnya pakai
+     `position: sticky` — kombinasi itu dengan tabel yang overflow-x:auto
+     di sini bikin Chromium tetap menghitung lebar penuh tabel yang
+     ter-clip ke `document.documentElement.scrollWidth` (halaman jadi bisa
+     discroll horizontal walau isi wrap ini sendiri sudah kepotong rapi).
+     `contain: layout` mengisolasi perhitungan layout wrap ini dari induk
+     sticky-nya, menghilangkan overflow hantu tsb tanpa mengubah tampilan. */
+  contain: layout;
 }
 .admin-table {
   width: 100%;

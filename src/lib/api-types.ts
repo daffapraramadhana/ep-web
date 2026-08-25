@@ -257,3 +257,29 @@ export interface EmployeeDetailView {
   skills: EmployeeSkillView[];
   lessonHistory: LessonHistoryView[];
 }
+
+// ---------------------------------------------------------------------------
+// GET /admin/reports & PATCH /admin/reports/:id —
+// apps/api/src/content/admin-reports.controller.ts
+// ---------------------------------------------------------------------------
+
+export type ReportStatus = 'OPEN' | 'RESOLVED';
+export type ItemType = 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT';
+export type ItemStatus = 'DRAFT' | 'LIVE' | 'RETIRED';
+
+export interface ItemReportItemView {
+  id: string;
+  lessonId: string;
+  prompt: string; // dipotong 120 karakter di BE
+  type: ItemType;
+  status: ItemStatus;
+}
+
+export interface ItemReportView {
+  id: string;
+  note: string;
+  status: ReportStatus;
+  createdAt: string;
+  reporter: { name: string };
+  item: ItemReportItemView;
+}
