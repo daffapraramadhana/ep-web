@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 
 interface InviteResponse {
@@ -104,10 +105,13 @@ export default function InvitePage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
-          <h1 className="mb-2 text-lg font-semibold text-gray-900">Berhasil</h1>
-          <p className="text-sm text-gray-700">
-            Akun aktif. Aplikasi belajar menyusul — tunggu pengumuman.
-          </p>
+          <h1 className="mb-2 text-lg font-semibold text-gray-900">Akun aktif — silakan masuk</h1>
+          <Link
+            href="/login"
+            className="mt-4 inline-block w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Masuk
+          </Link>
         </div>
       </div>
     );
