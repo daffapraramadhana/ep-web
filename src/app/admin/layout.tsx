@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { label: 'Import Soal', href: '/admin/import' },
   { label: 'Soal & Lesson', href: '/admin/soal' },
   { label: 'Media', href: '/admin/media' },
-  { label: 'Karyawan', href: '/admin/karyawan' },
+  { label: 'Karyawan', href: '/admin/users' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
