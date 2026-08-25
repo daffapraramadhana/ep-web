@@ -1383,6 +1383,111 @@ body {
   color: var(--bad-dark);
 }
 
+/* Pill status karyawan (Task 5, brief tabel /admin/karyawan §5): hijau
+   on_track · biru aktif · amber butuh_perhatian · abu belum_mulai. Amber
+   pakai #B45309 di atas --warn-soft (kelas berbeda dari .status-pill-draft
+   dsb di atas — §7 "jangan teks putih di atas amber", sama aturannya dgn
+   .admin-stat-card-amber/.admin-report-badge). */
+.status-pill-employee-on-track {
+  background: var(--good-soft);
+  color: var(--good-dark);
+}
+.status-pill-employee-aktif {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+.status-pill-employee-butuh-perhatian {
+  background: var(--warn-soft);
+  color: #b45309;
+}
+.status-pill-employee-belum-mulai {
+  background: var(--line);
+  color: var(--muted);
+}
+
+/* Filter pill (Task 5, /admin/karyawan §5) — filter status di atas tabel.
+   Selected memakai --brand solid (bukan --brand-soft) supaya beda tegas
+   dari status pill di kolom tabel & kontras teks putih aman (indigo cukup
+   gelap, lihat §7). */
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.filter-pill:hover {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+}
+.filter-pill-active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.filter-pill-active:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+.filter-pill:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Kalender aktivitas 56 hari (Task 5, detail /admin/karyawan/[id] §5) —
+   grid 8x7 (8 baris x 7 kolom = 56 sel), satu warna solid per sel (tanpa
+   emoji, beda dari .week-day app user — admin pakai warna+title tooltip
+   krn kalender di sini jauh lebih besar). met=--brand, partial=--brand-soft,
+   frozen=sky (sama dgn .week-day-frozen), empty=--line. */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 14px;
+}
+.cal-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+}
+.cal-cell-met {
+  background: var(--brand);
+}
+.cal-cell-partial {
+  background: var(--brand-soft);
+}
+.cal-cell-frozen {
+  background: #e0f2fe;
+}
+.cal-cell-empty {
+  background: var(--line);
+}
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.cal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.cal-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+
 /* Modifier ukuran kecil utk ChunkyButton dipakai inline (aksi baris tabel:
    Terbitkan/Tarik/Pensiunkan). Efek tekan-turun tetap ada (§2 "wajib di
    semua varian"), cuma diperkecil skalanya. Additive-only: tidak mengubah

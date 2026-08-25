@@ -13,6 +13,7 @@
  * - JourneyView / JourneyTopicView / JourneyLessonView: apps/api/src/journey/journey.service.ts
  * - ProgressView / ProgressSkillView / ProgressWeekDayView: apps/api/src/progress/progress.service.ts
  * - OverviewView (+ HardestItemView/ExhaustedByLevelView/dst): apps/api/src/monitoring/monitoring.service.ts
+ * - EmployeeListItemView / EmployeeDetailView (+ tipe pendukung): apps/api/src/monitoring/monitoring.service.ts
  */
 
 // ---------------------------------------------------------------------------
@@ -199,4 +200,60 @@ export interface OverviewView {
     exhaustedByLevel: ExhaustedByLevelView[];
   };
   openReports: number;
+}
+
+// ---------------------------------------------------------------------------
+// GET /admin/monitoring/employees & /admin/monitoring/employees/:id —
+// apps/api/src/monitoring/monitoring.service.ts (+ EmployeeStatus dari
+// apps/api/src/monitoring/metrics.ts)
+// ---------------------------------------------------------------------------
+
+export type EmployeeStatus = 'aktif' | 'on_track' | 'butuh_perhatian' | 'belum_mulai';
+
+export interface EmployeeListItemView {
+  id: string;
+  name: string;
+  email: string;
+  level: Level | null;
+  status: EmployeeStatus;
+  activeDays7: number;
+  sessionsThisWeek: number;
+  streak: number;
+  lessonsDone: number;
+  trend: 'up' | 'down' | 'flat' | null;
+  lastActiveAt: string | null;
+}
+
+export type CalendarDayState = 'met' | 'partial' | 'frozen' | 'empty';
+
+export interface CalendarDayView {
+  date: string;
+  state: CalendarDayState;
+}
+
+export interface EmployeeSkillView {
+  skill: SkillTag;
+  answered: number;
+  accuracy: number | null;
+}
+
+export interface LessonHistoryView {
+  lessonId: string;
+  title: string;
+  topic: string;
+  completedAt: string;
+  accuracy: number | null;
+}
+
+export interface EmployeeDetailView {
+  name: string;
+  email: string;
+  level: Level | null;
+  joinedAt: string;
+  streak: number;
+  longestStreak: number;
+  xpTotal: number;
+  calendar: CalendarDayView[];
+  skills: EmployeeSkillView[];
+  lessonHistory: LessonHistoryView[];
 }
