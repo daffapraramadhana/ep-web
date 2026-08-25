@@ -25,11 +25,24 @@
   --line: #e5e7eb;
   --bg: #f8fafc;
 
-  /* Identitas per-skill (progress, ikon skill) */
+  /* Identitas per-skill (chip/aksen di atas latar TERANG — jangan dipakai
+     sbg background baris penuh warna, kontras teks putih tidak cukup utk
+     3 dari 4, lihat token -deep di bawah & fix report task-14). */
   --skill-vocabulary: #4f46e5; /* indigo */
   --skill-grammar: #0ea5e9; /* sky   */
   --skill-listening: #f59e0b; /* amber */
   --skill-reading: #ec4899; /* pink  */
+
+  /* Identitas per-skill — varian "deep" (700-ish), dipakai KHUSUS sbg
+     background baris penuh warna (Progress) yang menampung teks/ikon/Ring
+     putih. Setiap satu diverifikasi >=4.5:1 terhadap #fff (§7 "Kontras
+     teks ≥4.5:1" — aturan tanpa syarat; token dasar di atas gagal untuk
+     grammar/listening/reading, lihat fix report task-14 utk angka
+     pastinya). Jangan pakai token dasar di atas utk background baris. */
+  --skill-vocabulary-deep: #4f46e5; /* indigo — sudah cukup gelap, sama dgn dasar */
+  --skill-grammar-deep: #0369a1; /* sky-700 */
+  --skill-listening-deep: #b45309; /* amber-700 */
+  --skill-reading-deep: #be185d; /* pink-700 */
 
   --background: #ffffff;
   --foreground: var(--ink);
@@ -60,6 +73,10 @@
   --color-skill-grammar: var(--skill-grammar);
   --color-skill-listening: var(--skill-listening);
   --color-skill-reading: var(--skill-reading);
+  --color-skill-vocabulary-deep: var(--skill-vocabulary-deep);
+  --color-skill-grammar-deep: var(--skill-grammar-deep);
+  --color-skill-listening-deep: var(--skill-listening-deep);
+  --color-skill-reading-deep: var(--skill-reading-deep);
   --font-sans: var(--font-nunito);
 }
 
@@ -969,12 +986,15 @@ body {
 
 /* ============================================================
    Progress (Task 14) — design-system.md §2 "Bar skill" + §5 (ikon
-   skill) + §7 (kontras). Baris skill warna penuh via token --skill-*
+   skill) + §7 (kontras). Baris skill warna penuh via token --skill-*-deep
    (inline style di page.tsx, konsisten dgn TOPIC_PILL_COLORS di
-   journey-path.tsx). Teks putih default; `.skill-row-amber` (Listening)
-   memakai teks/ikon gelap #B45309 karena --skill-listening = --warn
-   amber dan putih-di-atas-amber gagal kontras (§7, pola sama dengan
-   .meta-chip-amber yang sudah ada).
+   journey-path.tsx). §7 "Kontras teks ≥4.5:1" berlaku TANPA syarat ke
+   semua baris (bukan cuma amber) — makanya background pakai varian
+   "-deep" (700-ish, masing2 sudah diverifikasi >=4.5:1 terhadap putih,
+   lihat fix report task-14), bukan token --skill-* dasar. Dengan latar
+   sudah cukup gelap, teks/ikon/Ring putih aman dipakai SERAGAM di
+   keempat baris — tidak perlu lagi perlakuan teks-gelap khusus utk
+   Listening/amber.
    ============================================================ */
 .skill-row {
   display: flex;
@@ -983,9 +1003,6 @@ body {
   border-radius: 18px;
   padding: 14px 16px;
   color: #fff;
-}
-.skill-row-amber {
-  color: #b45309;
 }
 .skill-row-empty {
   background: var(--bg);
@@ -1001,10 +1018,6 @@ body {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.25);
   flex-shrink: 0;
-}
-.skill-row-amber .skill-row-icon {
-  background: rgba(255, 255, 255, 0.6);
-  color: #b45309;
 }
 .skill-row-empty .skill-row-icon {
   background: #fff;
@@ -1031,12 +1044,6 @@ body {
 }
 .skill-ring-arc {
   stroke: #fff;
-}
-.skill-ring-track-amber {
-  stroke: rgba(180, 83, 9, 0.2);
-}
-.skill-ring-arc-amber {
-  stroke: #b45309;
 }
 .skill-ring-pct {
   font-size: 12.5px;

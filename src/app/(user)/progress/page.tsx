@@ -7,20 +7,22 @@
  * Beranda (home/page.tsx) persis.
  *
  * 3 blok, atas ke bawah:
- * 1. 4 baris skill berwarna penuh (token --skill-*) + ikon + ring % putih
- *    (akurasi percobaan-pertama). `accuracy === null` (belum ada attempt
- *    utk skill itu) -> baris abu netral "Belum ada data", bukan warna
- *    skill (status tidak boleh warna saja — §7).
+ * 1. 4 baris skill berwarna penuh (token --skill-*-deep) + ikon + ring %
+ *    putih (akurasi percobaan-pertama). `accuracy === null` (belum ada
+ *    attempt utk skill itu) -> baris abu netral "Belum ada data", bukan
+ *    warna skill (status tidak boleh warna saja — §7).
  * 2. Kartu "Minggu Ini": 7 hari (BE mengirim Senin->Minggu terurut, lihat
  *    ProgressWeekDayView) + emoji 🔥 aktif / 🧊 diselamatkan freeze / ·
  *    kosong. Emoji dipertahankan di sini (aturan kalender streak, §5).
  * 3. Kartu ringkas total (lesson selesai · total XP · streak terpanjang).
  *
- * Kontras (§7 "jangan teks putih di atas amber"): --skill-listening
- * memakai amber yang sama dengan --warn, jadi baris Listening SATU-
- * SATUNYA yang memakai teks/ikon gelap (#B45309, pola sama dengan
- * .meta-chip-amber yang sudah ada) — 3 skill lain (indigo/sky/pink)
- * memakai teks putih sesuai mockup v2.
+ * Kontras (§7 "Kontras teks ≥ 4.5:1" — aturan tanpa syarat, bukan cuma
+ * utk amber): semua 4 baris memakai teks/ikon/Ring PUTIH di atas token
+ * `--skill-*-deep` (bukan `--skill-*` biasa, yang cuma aman dipakai sbg
+ * aksen di atas latar terang) — varian -700 yang tiap satunya sudah
+ * diverifikasi >=4.5:1 terhadap putih (lihat fix report task-14).
+ * Sebelumnya Listening (amber) memakai teks gelap sbg workaround; kini
+ * tidak perlu lagi karena latarnya sendiri sudah digelapkan.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -34,21 +36,16 @@ import { Ring } from '@/components/progress';
 interface SkillMeta {
   label: string;
   icon: ComponentType<{ size?: number; strokeWidth?: number }>;
+  /** Token `-deep` (bukan `--skill-*` dasar) — sudah diverifikasi >=4.5:1
+   * terhadap teks putih, lihat fix report task-14. */
   color: string;
-  /** Listening/amber butuh teks gelap, bukan putih (§7). */
-  amber?: boolean;
 }
 
 const SKILL_META: Record<SkillTag, SkillMeta> = {
-  VOCABULARY: { label: 'Vocabulary', icon: BookOpen, color: 'var(--skill-vocabulary)' },
-  GRAMMAR: { label: 'Grammar', icon: Pencil, color: 'var(--skill-grammar)' },
-  LISTENING: {
-    label: 'Listening',
-    icon: Headphones,
-    color: 'var(--skill-listening)',
-    amber: true,
-  },
-  READING: { label: 'Reading', icon: FileText, color: 'var(--skill-reading)' },
+  VOCABULARY: { label: 'Vocabulary', icon: BookOpen, color: 'var(--skill-vocabulary-deep)' },
+  GRAMMAR: { label: 'Grammar', icon: Pencil, color: 'var(--skill-grammar-deep)' },
+  LISTENING: { label: 'Listening', icon: Headphones, color: 'var(--skill-listening-deep)' },
+  READING: { label: 'Reading', icon: FileText, color: 'var(--skill-reading-deep)' },
 };
 
 // BE mengirim `week` terurut Senin->Minggu (7 entri) — label dipetakan by
@@ -146,11 +143,7 @@ export default function ProgressPage() {
           }
 
           return (
-            <div
-              key={skill.skill}
-              className={`skill-row${meta.amber ? ' skill-row-amber' : ''}`}
-              style={{ background: meta.color }}
-            >
+            <div key={skill.skill} className="skill-row" style={{ background: meta.color }}>
               <span className="skill-row-icon">
                 <Icon size={22} strokeWidth={2.25} />
               </span>
@@ -162,8 +155,8 @@ export default function ProgressPage() {
                 size={52}
                 stroke={6}
                 pct={skill.accuracy ?? 0}
-                trackClass={meta.amber ? 'skill-ring-track-amber' : 'skill-ring-track'}
-                arcClass={meta.amber ? 'skill-ring-arc-amber' : 'skill-ring-arc'}
+                trackClass="skill-ring-track"
+                arcClass="skill-ring-arc"
               >
                 <span className="skill-ring-pct">{skill.accuracy}%</span>
               </Ring>
