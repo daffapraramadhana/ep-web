@@ -1248,7 +1248,20 @@ body {
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: 18px;
+}
+.admin-nav-group {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
+}
+.admin-nav-group-label {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
 }
 .admin-nav-item {
   display: flex;
@@ -1417,6 +1430,122 @@ body {
 .btn-outline-sm:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
+}
+
+/* Ringkasan: grafik aktivitas (ActivityChart, design-system.md §6 dataviz
+   "kontras, bukan-warna-saja" — nilai selalu tertera di tooltip + titik). */
+.activity-chart {
+  position: relative;
+}
+.activity-chart-svg {
+  display: block;
+  width: 100%;
+  height: 160px;
+}
+.activity-chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.activity-chart-area {
+  fill: var(--brand-soft);
+  stroke: none;
+}
+.activity-chart-line {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.activity-chart-dot {
+  fill: var(--brand);
+  transition: opacity 0.1s;
+}
+.activity-chart-axis-label {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--muted);
+}
+.activity-chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -135%);
+  white-space: nowrap;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink);
+  box-shadow: 0 2px 10px rgba(30, 27, 75, 0.12);
+  pointer-events: none;
+}
+
+/* Ringkasan: badge "N laporan soal terbuka" (amber, §7 teks #B45309 di atas
+   --warn-soft, bukan putih). */
+.admin-report-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  border: 1.5px solid var(--warn-border);
+  border-radius: 999px;
+  background: var(--warn-soft);
+  color: #b45309;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.1s;
+}
+.admin-report-badge:hover {
+  background: var(--warn-border);
+}
+.admin-report-badge:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Ringkasan: 5 kartu angka (brief §5) — nilai besar Nunito 900. */
+.admin-stat-value {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.admin-stat-card-amber {
+  border-color: var(--warn-border);
+  background: var(--warn-soft);
+}
+.admin-stat-card-amber .admin-stat-value {
+  color: #b45309;
+}
+.admin-stat-card-link {
+  display: block;
+  text-decoration: none;
+  transition: transform 0.12s;
+}
+.admin-stat-card-link:hover {
+  transform: translateY(-2px);
+}
+.admin-stat-card-link:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 22px;
+}
+
+/* Ringkasan: bar per level (Kehabisan konten). */
+.exhausted-bar-track {
+  flex: 1;
+  height: 10px;
+  background: var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.exhausted-bar-fill {
+  height: 100%;
+  background: var(--warn);
+  border-radius: 6px;
 }
 
 @media (min-width: 1024px) {

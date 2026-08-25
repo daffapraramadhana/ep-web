@@ -12,6 +12,7 @@
  * - SummaryView / NextLessonView: apps/api/src/me/summary.service.ts
  * - JourneyView / JourneyTopicView / JourneyLessonView: apps/api/src/journey/journey.service.ts
  * - ProgressView / ProgressSkillView / ProgressWeekDayView: apps/api/src/progress/progress.service.ts
+ * - OverviewView (+ HardestItemView/ExhaustedByLevelView/dst): apps/api/src/monitoring/monitoring.service.ts
  */
 
 // ---------------------------------------------------------------------------
@@ -155,4 +156,47 @@ export interface ProgressView {
   skills: ProgressSkillView[];
   week: ProgressWeekDayView[];
   totals: { lessonsDone: number; xpTotal: number; longestStreak: number };
+}
+
+// ---------------------------------------------------------------------------
+// GET /admin/monitoring/overview — apps/api/src/monitoring/monitoring.service.ts
+// (OverviewView & tipe pendukungnya, disalin persis)
+// ---------------------------------------------------------------------------
+
+export interface OverviewTotals {
+  employees: number;
+  active: number;
+  onTrack: number;
+  needsAttention: number;
+  notStarted: number;
+}
+
+export interface ActivitySeriesPoint {
+  date: string;
+  sessionsCompleted: number;
+}
+
+export interface HardestItemView {
+  itemId: string;
+  lessonId: string;
+  lessonTitle: string;
+  prompt: string;
+  wrongRate: number;
+  answers: number;
+}
+
+export interface ExhaustedByLevelView {
+  level: Level;
+  exhaustedPct: number;
+  users: number;
+}
+
+export interface OverviewView {
+  totals: OverviewTotals;
+  activitySeries: ActivitySeriesPoint[];
+  contentHealth: {
+    hardestItems: HardestItemView[];
+    exhaustedByLevel: ExhaustedByLevelView[];
+  };
+  openReports: number;
 }

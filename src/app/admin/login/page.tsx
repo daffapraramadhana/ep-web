@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
       localStorage.setItem('token', res.accessToken);
       localStorage.setItem('role', res.role);
       localStorage.setItem('name', res.name);
-      router.push('/admin/import');
+      router.push('/admin/ringkasan');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
     } finally {
