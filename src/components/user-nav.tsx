@@ -5,15 +5,19 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Home, Map, ChartColumn, User, Flame, LogOut } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { useMe, resetMe } from '@/lib/use-me';
+import { useSummary, resetSummary } from '@/lib/use-summary';
+import { Ring } from '@/components/progress';
 
 /**
  * Nav app user — design-system.md §2 "Navigasi": pill navy mengambang
- * (mobile, 16px dari bawah) yang menjadi sidebar kiri di desktop (>=1024px,
- * lihat media query `.user-nav-mobile` di globals.css). Item aktif =
- * lingkaran brand di belakang ikon (mobile) / pill penuh (desktop).
- * Wordmark + blok user hanya tampil di desktop (`.user-nav-brand` /
- * `.user-nav-user` display:none di mobile). Disembunyikan di /session* dan
- * /onboarding oleh (user)/layout.tsx.
+ * (mobile) yang menjadi sidebar kiri di desktop (>=1024px).
+ *
+ * Desktop "premium" (impeccable craft): permukaan gradien navy + garis
+ * highlight tepi kanan; item aktif memakai idiom chunky (border-bottom
+ * brand-dark + tekan-turun); blok target harian (ring mini dari
+ * /me/summary via useSummary — fetch dibagi dengan rail); blok user
+ * dengan ring avatar gradien + baris streak. Semua elemen desktop
+ * disembunyikan di mobile (display:none), pill mobile tak berubah.
  */
 
 interface NavItem {
@@ -33,15 +37,21 @@ export function UserNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { me } = useMe();
+  const { summary } = useSummary();
 
   const name = me?.name ?? '';
   const initial = name.trim().charAt(0).toUpperCase() || '?';
+
+  const target = summary && summary.dailyTarget > 0 ? summary.dailyTarget : 1;
+  const done = summary?.sessionsCompletedToday ?? 0;
+  const targetMet = summary !== null && done >= target;
 
   function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('name');
     resetMe();
+    resetSummary();
     router.replace('/login');
   }
 
@@ -73,12 +83,39 @@ export function UserNav() {
         })}
       </div>
 
-      <div className="user-nav-user">
-        <div className="user-nav-avatar" aria-hidden="true">
-          {initial}
+      {summary ? (
+        <div className="user-nav-goal" aria-label={`Target hari ini ${done} dari ${target} sesi`}>
+          <Ring
+            size={30}
+            stroke={4}
+            pct={(done / target) * 100}
+            trackClass="user-nav-goal-track"
+            arcClass="user-nav-goal-arc"
+          />
+          <div className="user-nav-goal-text">
+            <b>Target hari ini</b>
+            <span>
+              {done}/{target} sesi{targetMet ? ' ✅' : ''}
+            </span>
+          </div>
         </div>
-        <div className="user-nav-user-name" title={name}>
-          {name}
+      ) : null}
+
+      <div className="user-nav-user">
+        <div className="user-nav-avatar-ring" aria-hidden="true">
+          <div className="user-nav-avatar">{initial}</div>
+        </div>
+        <div className="user-nav-user-info">
+          <div className="user-nav-user-name" title={name}>
+            {name}
+          </div>
+          <div className="user-nav-user-streak">
+            {summary && summary.streak > 0
+              ? `🔥 ${summary.streak} hari`
+              : summary
+                ? 'Belum ada streak'
+                : ''}
+          </div>
         </div>
         <button type="button" className="user-nav-logout" onClick={logout} aria-label="Keluar">
           <LogOut size={18} strokeWidth={2.25} />

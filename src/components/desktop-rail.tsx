@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { Flame, Star, Snowflake } from 'lucide-react';
 import { api } from '@/lib/api';
-import type { SummaryView, ProgressView } from '@/lib/api-types';
+import type { ProgressView } from '@/lib/api-types';
 import { Card } from '@/components/ui';
+import { useSummary } from '@/lib/use-summary';
 
 /**
  * Rail kanan desktop (>=1024px) — rumah widget statistik yang di mobile
@@ -24,16 +25,11 @@ function weekEmoji(state: ProgressView['week'][number]['state']): string {
 }
 
 export function DesktopRail() {
-  const [summary, setSummary] = useState<SummaryView | null>(null);
+  const { summary } = useSummary();
   const [progress, setProgress] = useState<ProgressView | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    api<SummaryView>('/me/summary')
-      .then((s) => {
-        if (!cancelled) setSummary(s);
-      })
-      .catch(() => {});
     api<ProgressView>('/progress')
       .then((p) => {
         if (!cancelled) setProgress(p);
