@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlarmClock } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -19,14 +19,28 @@ import { Hero, HeroSkeleton } from '@/components/hero';
 export default function HomePage() {
   const router = useRouter();
   const [summary, setSummary] = useState<SummaryView | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [error, setError] = useState('');
   const [starting, setStarting] = useState(false);
 
-  useEffect(() => {
+  const loadSummary = useCallback(() => {
+    setLoading(true);
+    setLoadError('');
     api<SummaryView>('/me/summary')
-      .then(setSummary)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Terjadi kesalahan'));
+      .then((s) => {
+        setSummary(s);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoadError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+        setLoading(false);
+      });
   }, []);
+
+  useEffect(() => {
+    loadSummary();
+  }, [loadSummary]);
 
   async function startSession() {
     if (starting) return;
@@ -41,7 +55,7 @@ export default function HomePage() {
     }
   }
 
-  if (!summary) {
+  if (!summary && loading) {
     return (
       <div>
         <HeroSkeleton />
@@ -51,6 +65,25 @@ export default function HomePage() {
         </div>
       </div>
     );
+  }
+
+  if (!summary && loadError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-5">
+        <Card eyebrow="Beranda" title="Gagal memuat data" className="w-full max-w-sm text-center">
+          <p className="mb-4 text-sm font-semibold text-muted">
+            Periksa koneksimu, lalu coba lagi.
+          </p>
+          <ChunkyButton variant="ghost" onClick={loadSummary}>
+            Coba lagi
+          </ChunkyButton>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!summary) {
+    return null;
   }
 
   return (
