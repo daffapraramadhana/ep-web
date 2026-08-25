@@ -1,12 +1,12 @@
 'use client';
 
 /**
- * Sesi — Task 10 brief: kerangka state machine + feedback sheet +
- * resiliensi jaringan. Area jawaban di sini SENGAJA sementara (textarea
- * polos, semua tipe soal) — Task 11 mengganti dengan komponen per-tipe
- * (pilihan ganda / isian / susun kalimat). Yang final di task ini: header
- * (✕, SegmentBar, mute), queue/state machine (`useSession`), feedback
- * sheet, dan resiliensi submit.
+ * Sesi — Task 10 (kerangka state machine + feedback sheet + resiliensi
+ * jaringan) + Task 11 (komponen jawaban per-tipe + lapisan media). Yang
+ * final sejak Task 10 dan TIDAK direstruktur di sini: header (✕,
+ * SegmentBar, mute), queue/state machine (`useSession`), feedback sheet,
+ * dan resiliensi submit — Task 11 hanya mengganti area jawaban (textarea
+ * placeholder -> AnswerMc/AnswerIsian/AnswerChips) dan menambah MediaBlock.
  */
 
 import { Suspense, useEffect, useState } from 'react';
@@ -17,6 +17,10 @@ import { Card, ChunkyButton } from '@/components/ui';
 import { SegmentBar } from '@/components/progress';
 import { useSession } from '@/components/session/use-session';
 import { FeedbackSheet } from '@/components/session/feedback-sheet';
+import { MediaBlock } from '@/components/session/media-block';
+import { AnswerMc } from '@/components/session/answer-mc';
+import { AnswerIsian } from '@/components/session/answer-isian';
+import { AnswerChips } from '@/components/session/answer-chips';
 
 function SessionHeader({
   total,
@@ -72,16 +76,13 @@ function SessionBody() {
     reload,
   } = useSession(replayLessonId);
 
-  const [answer, setAnswer] = useState('');
+  // `null` = belum siap (PERIKSA mati) — kontrak `onReady` komponen jawaban
+  // per-tipe (Task 11 brief). Direset lewat remount (`key={item.itemId}`
+  // di bawah), BUKAN effect ini, supaya state internal komponen (opsi
+  // terpilih, chip di zona, dst) ikut ter-reset bersih tiap ganti soal.
+  const [answer, setAnswer] = useState<string | null>(null);
   const [muted, setMutedState] = useState<boolean>(() => sfx.getMuted());
   const [toast, setToast] = useState('');
-
-  // Textarea dikosongkan hanya saat pindah ke soal berikutnya (currentItem
-  // berganti), TIDAK saat submit gagal jaringan — brief: "jawaban user
-  // utuh" saat gagal jaringan.
-  useEffect(() => {
-    setAnswer('');
-  }, [currentItem?.itemId]);
 
   useEffect(() => {
     if (!toast) return;
@@ -100,7 +101,7 @@ function SessionBody() {
   }
 
   function handleSubmit() {
-    if (submitting || !answer.trim()) return;
+    if (submitting || answer === null) return;
     submit(answer);
   }
 
@@ -141,28 +142,50 @@ function SessionBody() {
       <SessionHeader total={total} filled={filled} muted={muted} onToggleMute={toggleMute} />
 
       {currentItem ? (
-        <div className="flex flex-1 flex-col px-5 pt-2 pb-6">
+        <div className="flex flex-1 flex-col px-5 pt-2 pb-6" key={currentItem.itemId}>
           <div className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-brand">
             {typeLabel(currentItem.type)}
           </div>
-          {currentItem.passage ? (
-            <p className="mb-3 text-sm font-semibold text-muted">{currentItem.passage}</p>
-          ) : null}
-          <h2 className="mb-5 text-[21px] font-black leading-snug text-ink">{currentItem.prompt}</h2>
 
-          <textarea
-            className="field-textarea mb-4 min-h-[100px] flex-1"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            disabled={submitting}
-            placeholder="Tulis jawabanmu di sini..."
-          />
+          <MediaBlock item={currentItem} />
+
+          {/* ISIAN merender prompt-nya sendiri (blank `___` -> input inline);
+              tipe lain memakai heading generik di sini. */}
+          {currentItem.type === 'ISIAN' ? (
+            <AnswerIsian
+              item={currentItem}
+              disabled={submitting || phase === 'feedback'}
+              result={phase === 'feedback' ? last : null}
+              onReady={setAnswer}
+              onSubmit={handleSubmit}
+            />
+          ) : (
+            <h2 className="mb-5 text-[21px] font-black leading-snug text-ink">{currentItem.prompt}</h2>
+          )}
+
+          {currentItem.type === 'PILIHAN_GANDA' ? (
+            <AnswerMc
+              item={currentItem}
+              disabled={submitting || phase === 'feedback'}
+              result={phase === 'feedback' ? last : null}
+              onReady={setAnswer}
+            />
+          ) : null}
+
+          {currentItem.type === 'SUSUN_KALIMAT' ? (
+            <AnswerChips
+              item={currentItem}
+              disabled={submitting || phase === 'feedback'}
+              result={phase === 'feedback' ? last : null}
+              onReady={setAnswer}
+            />
+          ) : null}
 
           <div className="flex-1" />
 
           <ChunkyButton
             variant="ghost"
-            disabled={submitting || !answer.trim()}
+            disabled={submitting || answer === null}
             onClick={handleSubmit}
           >
             {submitError ? 'COBA LAGI' : submitting ? 'MEMERIKSA...' : 'PERIKSA'}
