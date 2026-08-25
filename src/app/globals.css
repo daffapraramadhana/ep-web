@@ -733,6 +733,79 @@ body {
   white-space: pre-wrap;
 }
 
+/* ============================================================
+   Sesi — layar perayaan (Task 12 brief, mockup v2 `#celebrate`/
+   `.done-scr` + `.xprow`/`.xpbox`/`.strk`/`.conf`). Motion (count-up,
+   skip confetti di reduced-motion) diatur di celebrate.tsx — CSS di
+   sini murni struktur + keyframe jatuhnya confetti.
+   ============================================================ */
+.celebrate {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 24px;
+  text-align: center;
+}
+.celebrate-emoji {
+  font-size: 58px;
+  margin-bottom: 6px;
+}
+.celebrate-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 22px;
+  max-width: 320px;
+}
+.celebrate-cards {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.celebrate-card {
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  padding: 14px 22px;
+}
+.celebrate-card-value {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--warn);
+}
+.celebrate-card-value-good {
+  color: var(--good);
+}
+.celebrate-card-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.celebrate-streak {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--warn);
+  margin-bottom: 26px;
+}
+.celebrate-confetti {
+  position: absolute;
+  top: -12px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: celebrate-fall 2.6s linear infinite;
+}
+@keyframes celebrate-fall {
+  to {
+    transform: translateY(820px) rotate(540deg);
+  }
+}
+
 @media (min-width: 1024px) {
   .user-nav-mobile {
     left: 0;

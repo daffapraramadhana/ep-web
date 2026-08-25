@@ -16,6 +16,7 @@ import { sfx } from '@/lib/sfx';
 import { Card, ChunkyButton } from '@/components/ui';
 import { SegmentBar } from '@/components/progress';
 import { useSession } from '@/components/session/use-session';
+import { Celebrate } from '@/components/session/celebrate';
 import { FeedbackSheet } from '@/components/session/feedback-sheet';
 import { MediaBlock } from '@/components/session/media-block';
 import { AnswerMc } from '@/components/session/answer-mc';
@@ -125,15 +126,7 @@ function SessionBody() {
   }
 
   if (phase === 'done') {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-        <div className="mb-2 text-[58px]">🎉</div>
-        <p className="mb-6 text-base font-bold text-muted">(perayaan di Task 12)</p>
-        <ChunkyButton variant="good" className="max-w-xs" onClick={() => router.push('/home')}>
-          LANJUT
-        </ChunkyButton>
-      </div>
-    );
+    return <Celebrate summary={last?.summary ?? null} onContinue={() => router.push('/home')} />;
   }
 
   // phase 'answering' | 'feedback'
