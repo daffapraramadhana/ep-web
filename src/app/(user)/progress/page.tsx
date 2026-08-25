@@ -122,7 +122,7 @@ export default function ProgressPage() {
     <div className="space-y-3.5 px-5 py-[22px]">
       <h1 className="text-[22px] font-black text-ink">Progress</h1>
 
-      <div className="space-y-3">
+      <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
         {progress.skills.map((skill) => {
           const meta = SKILL_META[skill.skill];
           const Icon = meta.icon;
@@ -165,7 +165,7 @@ export default function ProgressPage() {
         })}
       </div>
 
-      <Card eyebrow="Minggu ini" title="Kalender streak">
+      <Card eyebrow="Minggu ini" title="Kalender streak" className="lg:hidden">
         <div className="week-grid">
           {progress.week.map((day, i) => (
             <div key={day.date} className={`week-day week-day-${day.state}`}>
@@ -177,7 +177,7 @@ export default function ProgressPage() {
         <p className="week-legend">🧊 = streak diselamatkan token pembeku</p>
       </Card>
 
-      <Card eyebrow="Ringkasan" title="Total pencapaian">
+      <Card eyebrow="Ringkasan" title="Total pencapaian" className="lg:hidden">
         <div className="totals-grid">
           <div className="totals-item">
             <div className="totals-value">{progress.totals.lessonsDone}</div>

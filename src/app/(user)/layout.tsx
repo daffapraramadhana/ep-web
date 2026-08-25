@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMe, resetMe } from '@/lib/use-me';
 import { UserNav } from '@/components/user-nav';
+import { DesktopRail } from '@/components/desktop-rail';
 import { sfx } from '@/lib/sfx';
 
 /**
@@ -78,9 +79,19 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className={showNav ? 'lg:pl-60' : ''}>
       <main className={showNav ? 'min-h-screen pb-28 lg:pb-6' : 'min-h-screen'}>
-        {/* Desktop: konten dibatasi kolom tengah 480px (UI/UX spec §2 —
-            "pengalaman tetap 'app'"); mobile tidak berubah. */}
-        <div className="lg:mx-auto lg:w-full lg:max-w-[480px]">{children}</div>
+        {showNav ? (
+          /* Desktop: dua kolom — konten utama 640px + rail widget 300px,
+             satu blok terpusat di area kanan sidebar. Mobile tak berubah
+             (rail display:none di bawah lg). */
+          <div className="lg:mx-auto lg:flex lg:max-w-[1010px] lg:justify-center lg:gap-6 lg:px-6 lg:pt-6">
+            <div className="min-w-0 lg:w-full lg:max-w-[640px]">{children}</div>
+            <DesktopRail />
+          </div>
+        ) : (
+          /* Sesi & onboarding: kolom fokus tanpa rail — di sini rasa
+             "mobile" justru disengaja (UI/UX spec §6). */
+          <div className="lg:mx-auto lg:w-full lg:max-w-[480px]">{children}</div>
+        )}
       </main>
       {showNav ? <UserNav /> : null}
     </div>

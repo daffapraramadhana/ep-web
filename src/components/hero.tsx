@@ -64,7 +64,7 @@ export function Hero({
 
   return (
     <div className="hero">
-      <div className="mb-[18px] flex gap-2">
+      <div className="mb-[18px] flex gap-2 lg:hidden">
         <StatPill hot>
           <Flame size={16} strokeWidth={2.25} />
           {streak}
