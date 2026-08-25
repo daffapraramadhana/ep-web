@@ -1,52 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ep-web — Daily English Learning Platform (Frontend)
 
-## Admin shell (Fase 1)
+Frontend untuk platform belajar bahasa Inggris harian karyawan. Satu proyek Next.js berisi **dua area**:
 
-Scaffold ini berisi:
+- **App user** (`/`) — onboarding, beranda (target harian + streak), sesi belajar interaktif (pilihan ganda, isian, susun kalimat + audio/gambar/bacaan), perayaan XP, peta perjalanan, progress, profil. Mobile-first dengan layout desktop dua kolom (app-frame + rail widget).
+- **Dashboard admin** (`/admin`) — import soal via template xlsx, kelola lesson/soal + status terbit, upload media, import & undang karyawan.
 
-- `/admin/login` — login admin (`POST /auth/login`).
-- `/admin/layout.tsx` — guard client-side: tanpa `token` di `localStorage` → redirect ke `/admin/login`; role bukan `ADMIN` → ditolak. Sidebar: Import Soal, Soal & Lesson, Media, Karyawan, Keluar.
-- `/invite/[token]` — halaman terima undangan (`GET /auth/invite/:token`, `POST /auth/accept-invite`).
-- `src/lib/api.ts` — helper fetch yang menyisipkan `Authorization: Bearer <token>` dan melempar `Error` dari body error API.
+**Murni lapisan tampilan** — semua penilaian, XP, dan logika bisnis dihitung [ep-api](https://github.com/daffapraramadhana/ep-api). Dokumen produk, spec UI/UX, dan design system: [ep-workflow](https://github.com/daffapraramadhana/ep-workflow) (`docs/design-system.md` wajib dibaca sebelum menyentuh UI).
 
-Konfigurasi: salin/atur `.env.local` dengan `NEXT_PUBLIC_API_URL` menunjuk ke API (default `http://localhost:3001`).
+**Stack:** Next.js 15 (App Router) · Tailwind 4 · Lucide · Nunito · WebAudio (sfx tanpa aset).
 
-### Hutang teknis (tech debt)
-
-- **Token disimpan di `localStorage`** (bukan httpOnly cookie). Ini adalah trade-off yang **disengaja untuk tahap pilot** — rentan terhadap XSS dibanding cookie httpOnly, tapi menyederhanakan implementasi Fase 1. Harus dimigrasikan ke cookie httpOnly + refresh token sebelum rilis produksi/skala lebih besar.
-- Guard route admin hanya berjalan di client (`useEffect`) — tidak ada proteksi di level middleware/server, sehingga sempat ada flash konten sebelum redirect pada koneksi lambat.
-
-## Getting Started
-
-First, run the development server:
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+echo 'NEXT_PUBLIC_API_URL=http://localhost:3001' > .env.local
+npm run dev                   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Butuh ep-api berjalan (lihat README-nya). Login admin memakai kredensial seed API; akun karyawan dibuat lewat menu Karyawan (CSV) → link undangan.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Skrip
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev      # dev server (Turbopack)
+npm run build    # build produksi (jangan dijalankan saat dev server hidup — sama-sama menulis .next/)
+npm run start    # serve hasil build
+npm run lint
+```
 
-## Learn More
+## Struktur
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── (user)/        # home, journey, progress, profile, session, onboarding
+│   ├── admin/         # login, import, content, media, users
+│   ├── login/         # login karyawan
+│   └── invite/[token] # aktivasi akun dari undangan
+├── components/        # ui.tsx (ChunkyButton dkk), hero, rail, nav, session/*
+└── lib/               # api client, api-types (mirror kontrak BE), sfx, hooks
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Konvensi penting: token desain hidup di `globals.css` (disalin dari design system — jangan hardcode warna); `src/lib/api-types.ts` harus selalu cermin kontrak BE; ikon Lucide `strokeWidth 2.25`; emoji hanya untuk perayaan/kalender.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Hutang teknis (disengaja untuk pilot)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Token di `localStorage`** (bukan cookie httpOnly) — rentan XSS; migrasikan ke cookie httpOnly + refresh token sebelum skala produksi.
+- **Guard route hanya di client** (`useEffect`) — ada flash singkat sebelum redirect di koneksi lambat; belum ada proteksi middleware/server.
+- Belum ada test otomatis FE — UI diverifikasi manual terskrip per fase (checklist di repo ep-workflow).
