@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMe } from '@/lib/use-me';
+import { useMe, resetMe } from '@/lib/use-me';
 
 /**
  * Gate root (Task 8 brief): tanpa token → `/login`; token ada → fetch /me
@@ -27,6 +27,10 @@ export default function RootGate() {
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('name');
+      // C1 fix: see (user)/layout.tsx and profile/page.tsx for the same
+      // call — without it the module-scope useMe cache survives this
+      // clear and the next user on this tab could see stale `me` data.
+      resetMe();
       router.replace('/login');
       return;
     }

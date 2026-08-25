@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useMe } from '@/lib/use-me';
+import { useMe, resetMe } from '@/lib/use-me';
 import { UserNav } from '@/components/user-nav';
+import { sfx } from '@/lib/sfx';
 
 /**
  * Layout route group `(user)` — guard + nav (Task 8 brief):
@@ -38,6 +39,10 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('name');
+      // C1 fix: see page.tsx / profile/page.tsx for the same call — without
+      // it the module-scope useMe cache survives this clear and the next
+      // user on this tab could see stale `me` data.
+      resetMe();
       router.replace('/login');
       return;
     }
@@ -49,6 +54,20 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
     setReady(true);
   }, [loading, me, error, pathname, router]);
+
+  // I4 fix: seed sfx's localStorage-backed mute state from the account's
+  // `soundOn` preference the FIRST time this device/browser sees this user
+  // (no 'soundOn' key in localStorage yet) — e.g. a new device, or a
+  // freshly-cleared profile that just logged in. Once a local preference
+  // exists, localStorage stays authoritative for playback (per sfx.ts) and
+  // this must not override it on every mount.
+  useEffect(() => {
+    if (!me) return;
+    if (typeof window === 'undefined') return;
+    if (window.localStorage.getItem('soundOn') === null) {
+      sfx.setMuted(!me.soundOn);
+    }
+  }, [me]);
 
   if (!ready) {
     return null;

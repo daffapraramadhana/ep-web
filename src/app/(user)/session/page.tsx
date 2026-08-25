@@ -13,6 +13,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { X, Volume2, VolumeX } from 'lucide-react';
 import { sfx } from '@/lib/sfx';
+import { api } from '@/lib/api';
 import { Card, ChunkyButton } from '@/components/ui';
 import { SegmentBar } from '@/components/progress';
 import { useSession } from '@/components/session/use-session';
@@ -99,6 +100,10 @@ function SessionBody() {
     const nextMuted = !muted;
     sfx.setMuted(nextMuted);
     setMutedState(nextMuted);
+    // I4 fix: keep the account's soundOn preference in sync too — fire-and-
+    // forget (localStorage stays authoritative for playback either way, so
+    // a failed PATCH here is silently ignored, same as profile/page.tsx).
+    api('/me', { method: 'PATCH', body: JSON.stringify({ soundOn: !nextMuted }) }).catch(() => {});
   }
 
   function handleSubmit() {
@@ -178,7 +183,13 @@ function SessionBody() {
 
           <ChunkyButton
             variant="ghost"
-            disabled={submitting || answer === null}
+            // I3 fix: also disabled while the feedback sheet is open —
+            // without this, PERIKSA stayed reachable underneath the open
+            // sheet (e.g. via keyboard) and a resubmit while `phase ===
+            // 'feedback'` could corrupt the queue (use-session.ts's
+            // `submit()` assumes it's only ever called for the CURRENT
+            // queue[0] item).
+            disabled={submitting || answer === null || phase === 'feedback'}
             onClick={handleSubmit}
           >
             {submitError ? 'COBA LAGI' : submitting ? 'MEMERIKSA...' : 'PERIKSA'}

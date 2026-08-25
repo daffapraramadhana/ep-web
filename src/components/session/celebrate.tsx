@@ -61,10 +61,15 @@ export function Celebrate({ summary, onContinue }: CelebrateProps) {
     reducedMotion || !summary ? (summary?.xpSession ?? 0) : 0,
   );
 
-  // Bunyi "sesi selesai" (arpeggio) — sekali per tampil, bukan per re-render.
+  // Bunyi "sesi selesai" (arpeggio) — sekali per tampil, bukan per
+  // re-render. M9 fix: gated on `summary` — the `summary === null` fallback
+  // (resumed session, already COMPLETED, no attempt data to celebrate) has
+  // nothing specific to celebrate, so it must not play the win sound either
+  // (was previously unconditional, alongside confetti unconditionally
+  // rendering below).
   useEffect(() => {
-    sfx.play('win');
-  }, []);
+    if (summary) sfx.play('win');
+  }, [summary]);
 
   // XP count-up ~700ms menuju xpSession — di-skip total (nilai akhir
   // langsung) bila reduced-motion atau tidak ada summary untuk dihitung.
@@ -94,14 +99,17 @@ export function Celebrate({ summary, onContinue }: CelebrateProps) {
   // (tidak ada DOM node sama sekali) bila reduced-motion — bukan hanya
   // animasi CSS yang dimatikan, supaya benar-benar tidak ada gerak.
   const confetti = useMemo<ConfettiPiece[]>(() => {
-    if (reducedMotion) return [];
-    const count = summary?.milestone ? 52 : 26;
+    // M9 fix: no `summary` -> nothing specific to celebrate -> no confetti
+    // either (was previously rendering 26 pieces even for the generic
+    // "Sesi selesai!" fallback).
+    if (reducedMotion || !summary) return [];
+    const count = summary.milestone ? 52 : 26;
     return Array.from({ length: count }, (_, i) => ({
       left: Math.random() * 100,
       color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
       delay: Math.random() * 1.2,
     }));
-  }, [reducedMotion, summary?.milestone]);
+  }, [reducedMotion, summary]);
 
   function handleContinue() {
     mutate();

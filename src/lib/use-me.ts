@@ -60,6 +60,21 @@ function fetchMe(): Promise<void> {
   return inFlight;
 }
 
+/**
+ * resetMe — clears the module-scope cache (C1 fix). Without this, logging
+ * out and logging back in as a DIFFERENT user on the same tab kept showing
+ * the previous user's `me` data until the next natural refetch, because the
+ * cache lives at module scope (shared across every consumer) and neither
+ * localStorage.removeItem() nor navigation ever touched it. Call this
+ * anywhere localStorage's token/role/name gets cleared (profile logout, and
+ * the token-invalid branches in page.tsx / (user)/layout.tsx) so the next
+ * mount starts from a clean slate instead of stale cached `me`.
+ */
+export function resetMe(): void {
+  inFlight = null;
+  setCache({ me: null, loading: true, error: null });
+}
+
 export function useMe() {
   const [state, setState] = useState<MeState>(cache);
 

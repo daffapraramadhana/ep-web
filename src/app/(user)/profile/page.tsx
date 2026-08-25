@@ -28,7 +28,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogOut, Volume2, VolumeX } from 'lucide-react';
 import { api } from '@/lib/api';
-import { useMe } from '@/lib/use-me';
+import { useMe, resetMe } from '@/lib/use-me';
 import { sfx } from '@/lib/sfx';
 import type { Level, MeView, PatchMeRequest } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
@@ -132,6 +132,10 @@ export default function ProfilePage() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('name');
+    // C1 fix: clear the useMe module cache too, or the next user to log in
+    // on this same tab would see this user's cached `me` until the next
+    // natural refetch (PII leak across accounts).
+    resetMe();
     router.replace('/login');
   }
 

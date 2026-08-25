@@ -109,7 +109,20 @@ export function useSession(replayLessonId: string | null): UseSessionResult {
 
   const submit = useCallback(
     async (answer: string) => {
-      if (!view || currentIdx === null || submittingRef.current) return;
+      // I3 fix: assert the invariant the `slice(1)` math below assumes —
+      // `currentIdx` must be the queue's own head. The FE's PERIKSA button
+      // is now also disabled during `phase === 'feedback'`, but this guard
+      // is the actual safety net: if submit() were ever reachable while
+      // stale (e.g. a queued click landing after `next()` already advanced
+      // `currentIdx`), submitting for the wrong index would desync `queue`
+      // from what's actually being displayed and silently drop an item.
+      if (
+        !view ||
+        currentIdx === null ||
+        submittingRef.current ||
+        currentIdx !== queue[0]
+      )
+        return;
       const item = view.items[currentIdx];
       submittingRef.current = true;
       setSubmitting(true);
@@ -134,7 +147,7 @@ export function useSession(replayLessonId: string | null): UseSessionResult {
         setSubmitting(false);
       }
     },
-    [view, currentIdx],
+    [view, currentIdx, queue],
   );
 
   const next = useCallback(() => {
