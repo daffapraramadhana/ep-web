@@ -103,7 +103,7 @@ export function JourneyPath({
                             onClick={() => onTapDone(lesson)}
                             aria-label={`${lesson.title} — selesai, tap untuk ulangi`}
                           >
-                            <Check size={26} strokeWidth={2.5} />
+                            <Check size={26} strokeWidth={2.25} />
                           </button>
                         ) : lesson.state === 'now' ? (
                           <button
@@ -113,7 +113,7 @@ export function JourneyPath({
                             disabled={nowDisabled}
                             aria-label={`${lesson.title} — mulai lesson ini`}
                           >
-                            <Play size={28} strokeWidth={2.5} />
+                            <Play size={28} strokeWidth={2.25} />
                           </button>
                         ) : (
                           <button
@@ -127,7 +127,7 @@ export function JourneyPath({
                             }
                             aria-label={`${lesson.title} — terkunci`}
                           >
-                            <Lock size={24} strokeWidth={2.5} />
+                            <Lock size={24} strokeWidth={2.25} />
                           </button>
                         )}
                       </div>
