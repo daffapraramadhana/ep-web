@@ -41,10 +41,13 @@ function statusMessage(sessionsCompletedToday: number, dailyTarget: number): str
   if (sessionsCompletedToday >= dailyTarget) {
     return 'Target hari ini tercapai. Sampai jumpa besok ✅';
   }
-  if (sessionsCompletedToday === 0) {
-    return 'Satu sesi lagi untuk menjaga streak-mu tetap menyala 🔥';
-  }
   const remaining = dailyTarget - sessionsCompletedToday;
+  if (sessionsCompletedToday === 0) {
+    if (remaining <= 1) {
+      return 'Satu sesi lagi untuk menjaga streak-mu tetap menyala 🔥';
+    }
+    return `${remaining} sesi lagi untuk menjaga streak-mu tetap menyala 🔥`;
+  }
   return `Tinggal ${remaining} sesi lagi untuk mencapai target hari ini.`;
 }
 
