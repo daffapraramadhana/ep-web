@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const NAV_ITEMS = [
   { label: 'Import Soal', href: '/admin/import' },
-  { label: 'Soal & Lesson', href: '/admin/soal' },
+  { label: 'Soal & Lesson', href: '/admin/content' },
   { label: 'Media', href: '/admin/media' },
   { label: 'Karyawan', href: '/admin/users' },
 ];
