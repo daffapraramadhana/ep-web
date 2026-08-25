@@ -77,7 +77,11 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className={showNav ? 'lg:pl-60' : ''}>
-      <main className={showNav ? 'min-h-screen pb-28 lg:pb-6' : 'min-h-screen'}>{children}</main>
+      <main className={showNav ? 'min-h-screen pb-28 lg:pb-6' : 'min-h-screen'}>
+        {/* Desktop: konten dibatasi kolom tengah 480px (UI/UX spec §2 —
+            "pengalaman tetap 'app'"); mobile tidak berubah. */}
+        <div className="lg:mx-auto lg:w-full lg:max-w-[480px]">{children}</div>
+      </main>
       {showNav ? <UserNav /> : null}
     </div>
   );
