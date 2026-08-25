@@ -14,6 +14,7 @@
  */
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TrendingUp, TrendingDown, Minus, Flame } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -146,13 +147,13 @@ function KaryawanBody() {
       'karyawan-monitoring.csv',
       filtered.map((e) => ({
         nama: e.name,
-        email: e.email,
-        status: STATUS_LABEL[e.status],
         hariAktif7: `${e.activeDays7}/7`,
         sesiMingguIni: e.sessionsThisWeek,
         streak: e.streak,
         lessonSelesai: e.lessonsDone,
         tren: e.trend ?? '',
+        status: STATUS_LABEL[e.status],
+        email: e.email,
         terakhirAktif: e.lastActiveAt ?? '',
       }))
     );
@@ -173,6 +174,7 @@ function KaryawanBody() {
             <button
               key={f.value || 'semua'}
               type="button"
+              aria-pressed={status === f.value}
               onClick={() => handleStatusChange(f.value)}
               className={`filter-pill${status === f.value ? ' filter-pill-active' : ''}`}
             >
@@ -215,9 +217,9 @@ function KaryawanBody() {
         <Card>
           <p className="text-sm font-semibold text-muted">
             Belum ada karyawan.{' '}
-            <a href="/admin/users" className="font-bold text-brand hover:underline">
+            <Link href="/admin/users" className="font-bold text-brand hover:underline">
               Undang karyawan
-            </a>{' '}
+            </Link>{' '}
             untuk mulai memantau aktivitas.
           </p>
         </Card>
