@@ -43,6 +43,20 @@ export default function UsersPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState('');
+  const [approvingId, setApprovingId] = useState('');
+
+  async function handleApprove(id: string) {
+    setApprovingId(id);
+    setListError('');
+    try {
+      await api(`/admin/users/${id}/approve`, { method: 'PATCH' });
+      await loadUsers();
+    } catch (err) {
+      setListError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+    } finally {
+      setApprovingId('');
+    }
+  }
 
   async function loadUsers() {
     setListLoading(true);
@@ -216,12 +230,13 @@ export default function UsersPage() {
               <th>Nama</th>
               <th>Email</th>
               <th>Status Undangan</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 && !listLoading && (
               <tr>
-                <td colSpan={3} className="text-center text-muted">
+                <td colSpan={4} className="text-center text-muted">
                   Belum ada karyawan.
                 </td>
               </tr>
@@ -230,7 +245,21 @@ export default function UsersPage() {
               <tr key={u.id}>
                 <td>{u.name}</td>
                 <td className="text-muted">{u.email}</td>
-                <td className="text-muted">{u.inviteStatus}</td>
+                <td className="text-muted">
+                  {u.inviteStatus === 'AWAITING_APPROVAL' ? 'Menunggu persetujuan' : u.inviteStatus}
+                </td>
+                <td>
+                  {u.inviteStatus === 'AWAITING_APPROVAL' && (
+                    <button
+                      type="button"
+                      onClick={() => handleApprove(u.id)}
+                      disabled={approvingId === u.id}
+                      className="btn-outline-sm"
+                    >
+                      {approvingId === u.id ? 'Menyetujui...' : 'Setujui'}
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

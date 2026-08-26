@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { ChunkyButton } from '@/components/ui';
 import { AuthShell } from '@/components/auth-shell';
@@ -52,7 +53,14 @@ export default function LoginPage() {
     <AuthShell
       title="Masuk"
       subtitle="Sedikit tiap hari, lama-lama jadi bukit."
-      footer={<>Akun dibuat lewat undangan admin perusahaanmu.</>}
+      footer={
+        <>
+          Belum punya akun?{' '}
+          <Link href="/register" className="underline">
+            Daftar di sini
+          </Link>
+        </>
+      }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
