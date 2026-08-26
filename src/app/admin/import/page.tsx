@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { Download } from 'lucide-react';
 import { api } from '@/lib/api';
 import { downloadCsv } from '@/lib/csv';
 import { Card, ChunkyButton } from '@/components/ui';
@@ -63,9 +64,29 @@ export default function ImportSoalPage() {
   return (
     <div className="max-w-3xl">
       <h1 className="mb-1 text-xl font-black text-ink">Import Soal</h1>
-      <p className="mb-6 text-sm font-semibold text-muted">
+      <p className="mb-4 text-sm font-semibold text-muted">
         Unggah berkas .xlsx berisi lesson dan item soal untuk diimpor ke sistem.
       </p>
+
+      {/* Template ikut dibundel app (public/) — tim konten tidak perlu
+          dikirimi file manual. Sumber: deliverables/template-soal-v1.xlsx. */}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <a
+          href="/template-soal-v1.xlsx"
+          download
+          className="inline-flex items-center gap-2 rounded-xl border-2 border-line bg-white px-4 py-2.5 text-sm font-extrabold text-brand transition-colors hover:border-brand-soft hover:bg-brand-soft"
+        >
+          <Download size={16} strokeWidth={2.25} />
+          Unduh Template (.xlsx)
+        </a>
+        <a
+          href="/petunjuk-pengisian.md"
+          download
+          className="text-sm font-bold text-muted underline underline-offset-2 hover:text-ink"
+        >
+          Petunjuk pengisian
+        </a>
+      </div>
 
       <form onSubmit={handleSubmit} className="mb-6 max-w-sm space-y-3">
         <input
