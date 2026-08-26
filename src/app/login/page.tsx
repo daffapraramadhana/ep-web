@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { ChunkyButton, Card } from '@/components/ui';
+import { ChunkyButton } from '@/components/ui';
+import { AuthShell } from '@/components/auth-shell';
 
 /**
  * Login user-facing (Task 8 brief) — form sama dengan `/admin/login` tapi
@@ -48,45 +49,49 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
-      <div className="w-full max-w-sm">
-        <Card title="Masuk">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="mb-1 block text-sm font-semibold text-ink">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-line px-3 py-2.5 text-sm focus:border-brand focus:outline-none"
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="mb-1 block text-sm font-semibold text-ink">
-                Kata Sandi
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-line px-3 py-2.5 text-sm focus:border-brand focus:outline-none"
-              />
-            </div>
-            {error && <p className="text-sm text-bad">{error}</p>}
-            <ChunkyButton type="submit" disabled={loading}>
-              {loading ? 'Memproses...' : 'Masuk'}
-            </ChunkyButton>
-          </form>
-        </Card>
-      </div>
-    </div>
+    <AuthShell
+      title="Masuk"
+      subtitle="Sedikit tiap hari, lama-lama jadi bukit."
+      footer={<>Akun dibuat lewat undangan admin perusahaanmu.</>}
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="auth-label">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="auth-input"
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="auth-label">
+            Kata Sandi
+          </label>
+          <input
+            id="password"
+            type="password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="auth-input"
+          />
+        </div>
+        {error && (
+          <p className="auth-error" role="alert">
+            {error}
+          </p>
+        )}
+        <ChunkyButton type="submit" disabled={loading}>
+          {loading ? 'Memproses...' : 'Masuk'}
+        </ChunkyButton>
+      </form>
+    </AuthShell>
   );
 }
