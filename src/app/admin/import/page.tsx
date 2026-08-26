@@ -5,6 +5,7 @@ import { Download } from 'lucide-react';
 import { api } from '@/lib/api';
 import { downloadCsv } from '@/lib/csv';
 import { Card, ChunkyButton } from '@/components/ui';
+import { PetunjukModal } from './petunjuk-modal';
 
 interface ImportError {
   row: number;
@@ -26,6 +27,7 @@ export default function ImportSoalPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<ImportResult | null>(null);
+  const [showPetunjuk, setShowPetunjuk] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,13 +81,13 @@ export default function ImportSoalPage() {
           <Download size={16} strokeWidth={2.25} />
           Unduh Template (.xlsx)
         </a>
-        <a
-          href="/petunjuk-pengisian.md"
-          download
+        <button
+          type="button"
+          onClick={() => setShowPetunjuk(true)}
           className="text-sm font-bold text-muted underline underline-offset-2 hover:text-ink"
         >
           Petunjuk pengisian
-        </a>
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="mb-6 max-w-sm space-y-3">
@@ -145,6 +147,7 @@ export default function ImportSoalPage() {
           )}
         </div>
       )}
+      {showPetunjuk ? <PetunjukModal onClose={() => setShowPetunjuk(false)} /> : null}
     </div>
   );
 }
