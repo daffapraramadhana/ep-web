@@ -262,6 +262,25 @@ body {
   font-size: 9px;
   color: #c7d2fe;
 }
+.hero-watermark {
+  display: none;
+}
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-anim {
+  animation: hero-rise 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+.hero-anim-1 { animation-delay: 0.05s; }
+.hero-anim-2 { animation-delay: 0.15s; }
+.hero-anim-3 { animation-delay: 0.25s; }
 .hero-msg-desktop {
   display: none;
 }
@@ -325,6 +344,9 @@ body {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .hero-anim {
+    animation: none;
+  }
   .user-nav-item:hover .user-nav-icon {
     transform: none;
   }
@@ -1895,13 +1917,31 @@ body {
     outline-offset: 2px;
   }
   .hero {
+    position: relative;
+    overflow: hidden;
     border-radius: 24px;
-    padding: 28px 32px;
+    padding: 36px 38px;
+    /* kedalaman: dua glow radial di atas gradien dasar */
+    background:
+      radial-gradient(560px 300px at 88% -20%, rgba(99, 102, 241, 0.32), transparent 65%),
+      radial-gradient(420px 260px at -8% 110%, rgba(245, 158, 11, 0.12), transparent 60%),
+      linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 70%, #4338ca 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .hero-watermark {
+    display: block;
+    position: absolute;
+    right: -26px;
+    bottom: -44px;
+    color: rgba(255, 255, 255, 0.05);
+    transform: rotate(-12deg);
+    pointer-events: none;
   }
   .hero-inner {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 28px;
+    gap: 32px;
     align-items: center;
   }
   .hero-bottom {
@@ -1910,29 +1950,54 @@ body {
   .hero-msg-mobile {
     display: none;
   }
+  /* tipografi berani: sapaan mendominasi, hierarki 30 -> 16.5 -> pill */
+  .hero-greet {
+    font-size: 30px;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .hero-greet small {
+    font-size: 13px;
+    margin-top: 6px;
+  }
   .hero-msg-desktop {
     display: block;
-    margin-top: 16px;
+    margin-top: 18px;
+    font-size: 16.5px;
+    font-weight: 800;
   }
   .hero-next {
-    display: block;
-    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 12px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     font-size: 12.5px;
     font-weight: 800;
     color: #c7d2fe;
   }
   .hero-ring-glow {
     position: relative;
-    transform: scale(1.18);
+    transform: scale(1.35);
     transform-origin: center;
-    margin-right: 8px;
+    margin-right: 22px;
   }
   .hero-ring-glow::before {
     content: '';
     position: absolute;
-    inset: -20px;
+    inset: -26px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.22), transparent 65%);
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.3), transparent 62%);
+    pointer-events: none;
+  }
+  .hero-ring-glow::after {
+    content: '';
+    position: absolute;
+    inset: -48px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.18), transparent 70%);
     pointer-events: none;
   }
   /* Hint keyboard sesi — desktop saja */

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Flame, Star, Snowflake } from 'lucide-react';
 import { StatPill } from './ui';
 import { Ring } from './progress';
@@ -66,8 +67,20 @@ export function Hero({
   const target = dailyTarget > 0 ? dailyTarget : 1;
   const pct = (sessionsCompletedToday / target) * 100;
 
+  // Entrance: arc ring terisi dari 0 -> pct saat mount (transisi 1s sudah ada
+  // di komponen Ring). Reduced-motion: CSS mematikan transisinya, nilai final
+  // tetap benar.
+  const [ringPct, setRingPct] = useState(0);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setRingPct(pct));
+    return () => cancelAnimationFrame(raf);
+  }, [pct]);
+
   return (
     <div className="hero">
+      <div className="hero-watermark" aria-hidden="true">
+        <Flame size={190} strokeWidth={1.25} />
+      </div>
       <div className="mb-[18px] flex gap-2 lg:hidden">
         <StatPill hot>
           <Flame size={16} strokeWidth={2.25} />
@@ -87,18 +100,18 @@ export function Hero({
           melayang, radius penuh. Mobile: susunan lama, tak berubah. */}
       <div className="hero-inner">
         <div className="hero-text">
-          <div className="hero-greet">
+          <div className="hero-greet hero-anim hero-anim-1">
             {greetingWIB()}, {name} 👋
             <small>Sedikit tiap hari, lama-lama jadi bukit.</small>
           </div>
-          <div className="hero-msg hero-msg-desktop">
+          <div className="hero-msg hero-msg-desktop hero-anim hero-anim-2">
             {statusMessage(sessionsCompletedToday, dailyTarget)}
           </div>
-          {nextLabel ? <div className="hero-next">Berikutnya: {nextLabel}</div> : null}
+          {nextLabel ? <div className="hero-next hero-anim hero-anim-3">Berikutnya: {nextLabel}</div> : null}
         </div>
         <div className="hero-bottom">
-          <div className="hero-ring-glow">
-            <Ring pct={pct}>
+          <div className="hero-ring-glow hero-anim hero-anim-2">
+            <Ring pct={ringPct}>
               <div className="hero-ring-label">
                 <b>
                   {sessionsCompletedToday}/{target}
