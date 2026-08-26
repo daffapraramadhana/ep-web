@@ -32,6 +32,7 @@ import { api } from '@/lib/api';
 import type { ProgressView, SkillTag } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
 import { Ring } from '@/components/progress';
+import { WeekStrip } from '@/components/week-strip';
 
 interface SkillMeta {
   label: string;
@@ -47,17 +48,6 @@ const SKILL_META: Record<SkillTag, SkillMeta> = {
   LISTENING: { label: 'Listening', icon: Headphones, color: 'var(--skill-listening-deep)' },
   READING: { label: 'Reading', icon: FileText, color: 'var(--skill-reading-deep)' },
 };
-
-// BE mengirim `week` terurut Senin->Minggu (7 entri) — label dipetakan by
-// index, bukan diparse ulang dari `date`, supaya tidak tergantung timezone
-// parsing "YYYY-MM-DD" di browser.
-const WEEKDAY_LABELS = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-
-function weekEmoji(state: 'active' | 'frozen' | 'empty'): string {
-  if (state === 'active') return '🔥';
-  if (state === 'frozen') return '🧊';
-  return '·';
-}
 
 function ProgressSkeleton() {
   return (
@@ -166,14 +156,7 @@ export default function ProgressPage() {
       </div>
 
       <Card eyebrow="Minggu ini" title="Kalender streak" className="lg:hidden">
-        <div className="week-grid">
-          {progress.week.map((day, i) => (
-            <div key={day.date} className={`week-day week-day-${day.state}`}>
-              <span className="week-day-label">{WEEKDAY_LABELS[i] ?? ''}</span>
-              <span className="week-day-emoji">{weekEmoji(day.state)}</span>
-            </div>
-          ))}
-        </div>
+        <WeekStrip week={progress.week} />
         <p className="week-legend">🧊 = streak diselamatkan token pembeku</p>
       </Card>
 

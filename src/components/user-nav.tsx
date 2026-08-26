@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Map, ChartColumn, User, Flame, LogOut } from 'lucide-react';
+import { Home, Map, ChartColumn, User, LogOut } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { useMe, resetMe } from '@/lib/use-me';
 import { useSummary, resetSummary } from '@/lib/use-summary';
 import { Ring } from '@/components/progress';
+import { Logo } from '@/components/logo';
 
 /**
  * Nav app user — design-system.md §2 "Navigasi": pill navy mengambang
@@ -59,9 +60,9 @@ export function UserNav() {
     <nav className="user-nav user-nav-mobile" aria-label="Navigasi utama">
       <div className="user-nav-brand" aria-hidden="true">
         <span className="user-nav-brand-icon">
-          <Flame size={20} strokeWidth={2.25} />
+          <Logo size={25} />
         </span>
-        Daily English
+        Fluen
       </div>
 
       <div className="user-nav-items">

@@ -9,7 +9,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Daily English Learning Platform",
+  title: "Fluen — Belajar Bahasa Inggris Harian",
   description: "Platform pembelajaran bahasa Inggris harian untuk karyawan.",
 };
 

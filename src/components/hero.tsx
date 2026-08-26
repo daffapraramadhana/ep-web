@@ -1,18 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Flame, Star, Snowflake } from 'lucide-react';
-import { StatPill } from './ui';
-import { Ring } from './progress';
 
 /**
- * Hero — hero gelap Beranda (design-system.md §1: gradien
- * navy → navy-2 → #4338CA, radius bawah 30; ref visual mockup v2 `.hero2`).
+ * Hero — hero terang typographic Beranda (redesign 26 Agu 2026, ref
+ * Dribbble Scanner/EverSync): sapaan = headline ink besar di latar
+ * terang, SATU aksen warna berupa chip highlight pada info kunci
+ * (.hero-mark), target harian sebagai tile kotak (bahasa rectangle yang
+ * sama dgn kartu; ref tile pastel Scanner) di kanan.
  * Task 9 brief §4 (copy states):
  * - sapaan per jam WIB: pagi<11, siang<15, sore<19, else malam.
  * - kalimat motivasi di bawah sapaan (tetap, tone umum).
- * - pesan status di samping ring: belum sesi -> motivasi progres;
- *   sebagian -> sisa sesi; tercapai -> "Sampai jumpa besok ✅".
+ * - pesan status: belum sesi -> motivasi progres; sebagian -> sisa sesi;
+ *   tercapai -> "Sampai jumpa besok."
+ * Tanpa emoji: design-system.md §5 — emoji hanya untuk perayaan &
+ * kalender streak, bukan elemen UI struktural seperti hero.
  */
 
 export interface HeroProps {
@@ -41,18 +44,34 @@ function greetingWIB(): string {
   return 'Selamat malam';
 }
 
-function statusMessage(sessionsCompletedToday: number, dailyTarget: number): string {
+/**
+ * Pesan status dengan satu highlight chip (.hero-mark) pada info kunci —
+ * chip hijau-gelap saat tercapai, chip brand untuk sisa sesi.
+ */
+function statusMessage(sessionsCompletedToday: number, dailyTarget: number): ReactNode {
   if (sessionsCompletedToday >= dailyTarget) {
-    return 'Target hari ini tercapai. Sampai jumpa besok ✅';
+    return (
+      <>
+        Target hari ini <span className="hero-mark hero-mark-good">tercapai</span>. Sampai
+        jumpa besok.
+      </>
+    );
   }
   const remaining = dailyTarget - sessionsCompletedToday;
   if (sessionsCompletedToday === 0) {
-    if (remaining <= 1) {
-      return 'Satu sesi lagi untuk menjaga streak-mu tetap menyala 🔥';
-    }
-    return `${remaining} sesi lagi untuk menjaga streak-mu tetap menyala 🔥`;
+    return (
+      <>
+        Tinggal <span className="hero-mark">{remaining} sesi</span> lagi untuk menjaga
+        streak-mu tetap menyala.
+      </>
+    );
   }
-  return `Tinggal ${remaining} sesi lagi untuk mencapai target hari ini.`;
+  return (
+    <>
+      Tinggal <span className="hero-mark">{remaining} sesi</span> lagi untuk mencapai
+      target hari ini.
+    </>
+  );
 }
 
 export function Hero({
@@ -65,83 +84,79 @@ export function Hero({
   nextLabel,
 }: HeroProps) {
   const target = dailyTarget > 0 ? dailyTarget : 1;
-  const pct = (sessionsCompletedToday / target) * 100;
+  const pct = Math.min(100, (sessionsCompletedToday / target) * 100);
+  const targetMet = sessionsCompletedToday >= target;
 
-  // Entrance: arc ring terisi dari 0 -> pct saat mount (transisi 1s sudah ada
-  // di komponen Ring). Reduced-motion: CSS mematikan transisinya, nilai final
-  // tetap benar.
-  const [ringPct, setRingPct] = useState(0);
+  // Entrance: bar tile terisi dari 0 -> pct saat mount (transisi CSS 1s).
+  // Reduced-motion: CSS mematikan transisinya, nilai final tetap benar.
+  const [barPct, setBarPct] = useState(0);
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setRingPct(pct));
+    const raf = requestAnimationFrame(() => setBarPct(pct));
     return () => cancelAnimationFrame(raf);
   }, [pct]);
 
   return (
-    <div className="hero">
-      <div className="hero-watermark" aria-hidden="true">
-        <Flame size={190} strokeWidth={1.25} />
-      </div>
-      <div className="mb-[18px] flex gap-2 lg:hidden">
-        <StatPill hot>
+    <header className="hero">
+      <div className="hero-stats hero-anim hero-anim-1">
+        <span className="hero-stat">
           <Flame size={16} strokeWidth={2.25} />
           {streak}
-        </StatPill>
-        <StatPill>
+        </span>
+        <span className="hero-stat">
           <Star size={16} strokeWidth={2.25} />
           {xpTotal.toLocaleString('id-ID')} XP
-        </StatPill>
+        </span>
         {freezeAvailableThisWeek ? (
-          <StatPill className="ml-auto">
+          <span className="hero-stat hero-stat-sky ml-auto">
             <Snowflake size={16} strokeWidth={2.25} />1
-          </StatPill>
+          </span>
         ) : null}
       </div>
-      {/* Desktop: grid 2 kolom (teks kiri, ring kanan ber-glow) — kartu
-          melayang, radius penuh. Mobile: susunan lama, tak berubah. */}
       <div className="hero-inner">
         <div className="hero-text">
-          <div className="hero-greet hero-anim hero-anim-1">
-            {greetingWIB()}, {name} 👋
+          <h1 className="hero-greet hero-anim hero-anim-2">
+            {greetingWIB()}, {name}
             <small>Sedikit tiap hari, lama-lama jadi bukit.</small>
-          </div>
-          <div className="hero-msg hero-msg-desktop hero-anim hero-anim-2">
+          </h1>
+          <p className="hero-msg hero-anim hero-anim-3">
             {statusMessage(sessionsCompletedToday, dailyTarget)}
-          </div>
-          {nextLabel ? <div className="hero-next hero-anim hero-anim-3">Berikutnya: {nextLabel}</div> : null}
+          </p>
+          {nextLabel ? (
+            <div className="hero-next hero-anim hero-anim-3">Berikutnya: {nextLabel}</div>
+          ) : null}
         </div>
-        <div className="hero-bottom">
-          <div className="hero-ring-glow hero-anim hero-anim-2">
-            <Ring pct={ringPct}>
-              <div className="hero-ring-label">
-                <b>
-                  {sessionsCompletedToday}/{target}
-                </b>
-                <span>SESI HARI INI</span>
-              </div>
-            </Ring>
-          </div>
-          <div className="hero-msg hero-msg-mobile">
-            {statusMessage(sessionsCompletedToday, dailyTarget)}
+        <div
+          className={`hero-tile${targetMet ? ' hero-tile-met' : ''} hero-anim hero-anim-2`}
+          aria-label={`Sesi hari ini ${sessionsCompletedToday} dari ${target}`}
+        >
+          <b>
+            {sessionsCompletedToday}/{target}
+          </b>
+          <span>SESI HARI INI</span>
+          <div className="hero-tile-bar" aria-hidden="true">
+            <div style={{ width: `${barPct}%` }} />
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
-/** Skeleton pulse — bentuk kasar hero, dipakai saat /me/summary loading. */
+/** Skeleton pulse — bentuk kasar hero terang, dipakai saat /me/summary loading. */
 export function HeroSkeleton() {
   return (
     <div className="hero">
-      <div className="mb-[18px] flex gap-2">
-        <div className="skeleton h-[27px] w-[56px] rounded-full" />
-        <div className="skeleton h-[27px] w-[80px] rounded-full" />
+      <div className="hero-stats">
+        <div className="skeleton h-[30px] w-[62px] rounded-full" />
+        <div className="skeleton h-[30px] w-[92px] rounded-full" />
       </div>
-      <div className="skeleton h-[21px] w-[70%] rounded-lg" />
-      <div className="skeleton mt-2 h-[13px] w-[55%] rounded-lg" />
-      <div className="hero-bottom">
-        <div className="skeleton h-[92px] w-[92px] rounded-full" />
-        <div className="skeleton h-[36px] flex-1 rounded-lg" />
+      <div className="hero-inner">
+        <div className="hero-text">
+          <div className="skeleton h-[26px] w-[75%] rounded-lg" />
+          <div className="skeleton mt-2 h-[13px] w-[55%] rounded-lg" />
+          <div className="skeleton mt-4 h-[18px] w-[85%] rounded-lg" />
+        </div>
+        <div className="skeleton h-[96px] w-[108px] rounded-[20px]" />
       </div>
     </div>
   );

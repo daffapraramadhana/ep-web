@@ -1,4 +1,4 @@
-# ep-web — Daily English Learning Platform (Frontend)
+# ep-web — Fluen (Frontend)
 
 Frontend untuk platform belajar bahasa Inggris harian karyawan. Satu proyek Next.js berisi **dua area**:
 
@@ -42,6 +42,16 @@ src/
 ```
 
 Konvensi penting: token desain hidup di `globals.css` (disalin dari design system — jangan hardcode warna); `src/lib/api-types.ts` harus selalu cermin kontrak BE; ikon Lucide `strokeWidth 2.25`; emoji hanya untuk perayaan/kalender.
+
+### Logo & favicon
+
+Mark Fluen hidup di dua tempat yang **harus diubah bersamaan**: `src/components/logo.tsx` (komponen React, tanpa latar) dan `src/app/icon.svg` (favicon, dengan latar putih membulat). `favicon.ico` dan `apple-icon.png` adalah turunan `icon.svg` — regenerate sesudah mark berubah:
+
+```bash
+node -e "const s=require('sharp'),f=require('fs'),A='src/app';const p=n=>s(f.readFileSync(A+'/icon.svg'),{density:384}).resize(n,n).png().toBuffer();(async()=>{const sz=[16,32,48],im=await Promise.all(sz.map(async n=>({n,d:await p(n)})));let o=6+im.length*16;const d=Buffer.alloc(6);d.writeUInt16LE(1,2);d.writeUInt16LE(im.length,4);const e=im.map(({n,d:b})=>{const x=Buffer.alloc(16);x.writeUInt8(n,0);x.writeUInt8(n,1);x.writeUInt16LE(1,4);x.writeUInt16LE(32,6);x.writeUInt32LE(b.length,8);x.writeUInt32LE(o,12);o+=b.length;return x});f.writeFileSync(A+'/favicon.ico',Buffer.concat([d,...e,...im.map(i=>i.d)]));f.writeFileSync(A+'/apple-icon.png',await p(180))})()"
+```
+
+`sharp` sudah ikut sebagai dependensi Next; `.ico` ditulis manual karena sharp tidak mengekspor format itu (entri PNG-in-ICO, didukung semua browser modern).
 
 ## Hutang teknis (disengaja untuk pilot)
 

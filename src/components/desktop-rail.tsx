@@ -5,6 +5,7 @@ import { Flame, Star, Snowflake } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { ProgressView } from '@/lib/api-types';
 import { Card } from '@/components/ui';
+import { WeekStrip } from '@/components/week-strip';
 import { useSummary } from '@/lib/use-summary';
 
 /**
@@ -15,14 +16,6 @@ import { useSummary } from '@/lib/use-summary';
  * rail diam (tidak mengganggu konten utama). Disembunyikan di mobile
  * lewat kelas `desktop-rail` (display:none di bawah lg).
  */
-
-const WEEKDAY_LABELS = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
-
-function weekEmoji(state: ProgressView['week'][number]['state']): string {
-  if (state === 'active') return '🔥';
-  if (state === 'frozen') return '🧊';
-  return '·';
-}
 
 export function DesktopRail() {
   const { summary } = useSummary();
@@ -81,14 +74,7 @@ export function DesktopRail() {
       <Card eyebrow="Minggu ini" title="Kalender streak">
         {progress ? (
           <>
-            <div className="week-grid">
-              {progress.week.map((day, i) => (
-                <div key={day.date} className={`week-day week-day-${day.state}`}>
-                  <span className="week-day-label">{WEEKDAY_LABELS[i] ?? ''}</span>
-                  <span className="week-day-emoji">{weekEmoji(day.state)}</span>
-                </div>
-              ))}
-            </div>
+            <WeekStrip week={progress.week} />
             <p className="week-legend">🧊 = streak diselamatkan token pembeku</p>
           </>
         ) : (

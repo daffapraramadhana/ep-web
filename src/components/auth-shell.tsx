@@ -1,10 +1,11 @@
-import { Flame } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { Logo } from './logo';
 
 /**
- * AuthShell — bingkai bersama halaman login (/login & /admin/login):
- * latar navy ber-glow (bahasa visual chrome/hero app), wordmark flame,
- * kartu putih, dan microcopy kaki. Logika form tetap milik halaman.
+ * AuthShell — bingkai bersama halaman auth (/login, /register,
+ * /admin/login): latar terang polos (senada hero typographic Beranda),
+ * wordmark flame versi terang, kartu putih ala .card, microcopy kaki.
+ * Logika form tetap milik halaman.
  */
 export function AuthShell({
   title,
@@ -19,15 +20,12 @@ export function AuthShell({
 }) {
   return (
     <div className="auth-page">
-      <div className="auth-watermark" aria-hidden="true">
-        <Flame size={260} strokeWidth={1} />
-      </div>
       <div className="auth-box">
         <div className="auth-wordmark hero-anim hero-anim-1">
           <span className="auth-wordmark-icon">
-            <Flame size={22} strokeWidth={2.25} />
+            <Logo size={28} />
           </span>
-          Daily English
+          Fluen
         </div>
         <div className="auth-card hero-anim hero-anim-2">
           <h1 className="auth-title">{title}</h1>

@@ -64,24 +64,6 @@ export function Card({
 }
 
 /**
- * Stat pill (hero gelap) — varian `hot` untuk streak (tint amber).
- */
-export interface StatPillProps extends HTMLAttributes<HTMLDivElement> {
-  hot?: boolean;
-}
-
-export function StatPill({ hot, className, children, ...props }: StatPillProps) {
-  const classes = ['stat-pill', hot ? 'stat-pill-hot' : '', className]
-    .filter(Boolean)
-    .join(' ');
-  return (
-    <div className={classes} {...props}>
-      {children}
-    </div>
-  );
-}
-
-/**
  * Meta-chip (di kartu) — tone `brand` (default) atau `amber`.
  * Teks amber memakai #B45309 di atas --warn-soft (aksesibilitas §7 —
  * jangan teks putih di atas amber).

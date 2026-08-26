@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlarmClock } from 'lucide-react';
 import { api } from '@/lib/api';
-import type { SummaryView, SessionView } from '@/lib/api-types';
-import { Card, ChunkyButton, MetaChip } from '@/components/ui';
+import type { SummaryView, SessionView, ProgressView } from '@/lib/api-types';
+import { Card, ChunkyButton } from '@/components/ui';
 import { Hero, HeroSkeleton } from '@/components/hero';
+import { WeekStrip } from '@/components/week-strip';
 
 /**
  * Beranda (Task 9 brief §Step 2) — hero + kartu Lanjutkan/Review/Penguatan.
@@ -23,6 +24,14 @@ export default function HomePage() {
   const [loadError, setLoadError] = useState('');
   const [error, setError] = useState('');
   const [starting, setStarting] = useState(false);
+  // Strip "Minggu ini" — non-blocking: beranda tetap tampil utuh bila
+  // GET /progress gagal, kartunya saja yang tidak muncul.
+  const [week, setWeek] = useState<ProgressView['week'] | null>(null);
+  useEffect(() => {
+    api<ProgressView>('/progress')
+      .then((p) => setWeek(p.week))
+      .catch(() => setWeek(null));
+  }, []);
 
   const loadSummary = useCallback(() => {
     setLoading(true);
@@ -116,14 +125,10 @@ export default function HomePage() {
             eyebrow="Sesi berjalan"
             title={summary.openSession.lessonTitle ?? 'Sesi Penguatan'}
           >
-            <div className="mb-3.5 flex flex-wrap gap-2">
-              <MetaChip>
-                {summary.openSession.answered}/{summary.openSession.total} soal terjawab
-              </MetaChip>
-              <MetaChip tone="amber">
-                tersisa {summary.openSession.total - summary.openSession.answered}
-              </MetaChip>
-            </div>
+            <p className="card-meta">
+              {summary.openSession.answered}/{summary.openSession.total} soal terjawab
+              {' · '}tersisa {summary.openSession.total - summary.openSession.answered}
+            </p>
             {/* Melanjutkan sesi menggantung selalu aksi utama — brand walau
                 target sudah tercapai. */}
             <ChunkyButton onClick={startSession} disabled={starting}>
@@ -132,11 +137,12 @@ export default function HomePage() {
           </Card>
         ) : summary.nextLesson ? (
           <Card eyebrow="Lanjutkan belajar" title={summary.nextLesson.title}>
-            <div className="mb-3.5 flex flex-wrap gap-2">
-              <MetaChip>{summary.nextLesson.topic}</MetaChip>
-              <MetaChip tone="amber">±{summary.nextLesson.estMinutes} mnt</MetaChip>
-              <MetaChip tone="amber">+{summary.nextLesson.xpEstimate} XP</MetaChip>
-            </div>
+            {/* Meta sebagai satu baris teks tenang (bukan deretan chip warna) —
+                quiet pass: aksen warna disimpan untuk aksi & ring saja. */}
+            <p className="card-meta">
+              {summary.nextLesson.topic} · ±{summary.nextLesson.estMinutes} mnt · +
+              {summary.nextLesson.xpEstimate} XP
+            </p>
             <ChunkyButton
               variant={targetMet ? 'ghost' : 'brand'}
               onClick={startSession}
@@ -186,6 +192,17 @@ export default function HomePage() {
               <small>dari jawaban yang pernah salah</small>
             </div>
           </button>
+        ) : null}
+
+        {/* Mobile-only: di desktop kartu yang sama sudah hidup di rail
+            kanan (desktop-rail.tsx) — jangan dobel. */}
+        {week ? (
+          <Card eyebrow="Minggu ini" title="Kalender streak" className="lg:hidden">
+            <WeekStrip week={week} />
+            {week.some((d) => d.state === 'frozen') ? (
+              <p className="week-legend">🧊 = streak diselamatkan token pembeku</p>
+            ) : null}
+          </Card>
         ) : null}
       </div>
     </div>
