@@ -98,18 +98,39 @@ export default function HomePage() {
         sessionsCompletedToday={summary.sessionsCompletedToday}
         dailyTarget={summary.dailyTarget}
         nextLabel={
-          summary.nextLesson
-            ? `${summary.nextLesson.title} · ±${summary.nextLesson.estMinutes} mnt`
-            : summary.contentExhausted
-              ? 'Sesi Penguatan'
-              : null
+          summary.openSession
+            ? `Lanjutkan ${summary.openSession.lessonTitle ?? 'Sesi Penguatan'} · tersisa ${summary.openSession.total - summary.openSession.answered} soal`
+            : summary.nextLesson
+              ? `${summary.nextLesson.title} · ±${summary.nextLesson.estMinutes} mnt`
+              : summary.contentExhausted
+                ? 'Sesi Penguatan'
+                : null
         }
       />
 
       <div className="home-body space-y-3.5 px-5 pt-[18px] pb-6 lg:px-0">
         {error ? <p className="text-sm font-semibold text-bad">{error}</p> : null}
 
-        {summary.nextLesson ? (
+        {summary.openSession ? (
+          <Card
+            eyebrow="Sesi berjalan"
+            title={summary.openSession.lessonTitle ?? 'Sesi Penguatan'}
+          >
+            <div className="mb-3.5 flex flex-wrap gap-2">
+              <MetaChip>
+                {summary.openSession.answered}/{summary.openSession.total} soal terjawab
+              </MetaChip>
+              <MetaChip tone="amber">
+                tersisa {summary.openSession.total - summary.openSession.answered}
+              </MetaChip>
+            </div>
+            {/* Melanjutkan sesi menggantung selalu aksi utama — brand walau
+                target sudah tercapai. */}
+            <ChunkyButton onClick={startSession} disabled={starting}>
+              {starting ? 'MEMUAT...' : 'LANJUTKAN'}
+            </ChunkyButton>
+          </Card>
+        ) : summary.nextLesson ? (
           <Card eyebrow="Lanjutkan belajar" title={summary.nextLesson.title}>
             <div className="mb-3.5 flex flex-wrap gap-2">
               <MetaChip>{summary.nextLesson.topic}</MetaChip>

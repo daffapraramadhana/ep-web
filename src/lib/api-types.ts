@@ -101,6 +101,12 @@ export interface NextLessonView {
   xpEstimate: number;
 }
 
+export interface OpenSessionView {
+  lessonTitle: string | null;
+  answered: number;
+  total: number;
+}
+
 export interface SummaryView {
   name: string;
   streak: number;
@@ -111,6 +117,7 @@ export interface SummaryView {
   reviewsDue: number;
   contentExhausted: boolean;
   nextLesson: NextLessonView | null;
+  openSession: OpenSessionView | null;
 }
 
 // ---------------------------------------------------------------------------
