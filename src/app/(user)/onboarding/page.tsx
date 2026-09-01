@@ -57,14 +57,21 @@ export default function OnboardingPage() {
   const [level, setLevel] = useState<Level | null>(null);
   const [dailyTarget, setDailyTarget] = useState<1 | 2>(1);
   const [saving, setSaving] = useState(false);
+  const [consented, setConsented] = useState(false);
   const [error, setError] = useState('');
 
   async function finish() {
-    if (!level || saving) return;
+    if (!level || !consented || saving) return;
     setError('');
     setSaving(true);
     try {
-      const body: PatchMeRequest = { level, dailyTargetSessions: dailyTarget };
+      const body: PatchMeRequest = {
+        level,
+        dailyTargetSessions: dailyTarget,
+        // Konsen sekali set, permanen (BE abaikan kalau sudah ada) — syarat
+        // UU PDP untuk latihan berbicara yang merekam suara.
+        voiceConsent: true,
+      };
       await api<MeView>('/me', { method: 'PATCH', body: JSON.stringify(body) });
       await mutate();
       router.replace('/home');
@@ -135,9 +142,24 @@ export default function OnboardingPage() {
                 );
               })}
             </div>
+            <label className={`consent-card${consented ? ' consent-card-checked' : ''}`}>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={consented}
+                onChange={(e) => setConsented(e.target.checked)}
+              />
+              <span className="consent-box" aria-hidden="true">
+                {consented ? '✓' : ''}
+              </span>
+              <span className="consent-text">
+                Saya setuju rekaman suara saya disimpan untuk keperluan penilaian latihan
+                berbicara.
+              </span>
+            </label>
             {error ? <p className="mt-3 text-sm font-semibold text-bad">{error}</p> : null}
             <div className="mt-6 space-y-2.5">
-              <ChunkyButton onClick={finish} disabled={saving}>
+              <ChunkyButton onClick={finish} disabled={saving || !consented}>
                 {saving ? 'MENYIMPAN...' : 'MULAI BELAJAR'}
               </ChunkyButton>
               <ChunkyButton variant="ghost" onClick={() => setStep(1)} disabled={saving}>

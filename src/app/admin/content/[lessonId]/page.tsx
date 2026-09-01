@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { ChunkyButton, StatusPill } from '@/components/ui';
 
-type ItemType = 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT';
+type ItemType = 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT' | 'UCAPAN';
 type ItemStatus = 'DRAFT' | 'LIVE' | 'RETIRED';
 
 interface ItemRow {
@@ -102,6 +102,8 @@ function buildPatch(item: ItemRow, form: FormState, baseline: FormState) {
       .filter(Boolean);
     if (!arraysEqual(accepted, baselineAccepted)) patch.acceptedAnswers = accepted;
   } else if (item.type === 'SUSUN_KALIMAT') {
+    if (form.answerKey !== baseline.answerKey) patch.answerKey = form.answerKey;
+  } else if (item.type === 'UCAPAN') {
     if (form.answerKey !== baseline.answerKey) patch.answerKey = form.answerKey;
   }
 
@@ -343,6 +345,17 @@ export default function LessonDetailPage() {
 
             {selectedItem.type === 'SUSUN_KALIMAT' && (
               <Field label="Kalimat Jawaban">
+                <input
+                  type="text"
+                  value={form.answerKey}
+                  onChange={(e) => setForm({ ...form, answerKey: e.target.value })}
+                  className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
+                />
+              </Field>
+            )}
+
+            {selectedItem.type === 'UCAPAN' && (
+              <Field label="Kalimat yang diucapkan (answer)">
                 <input
                   type="text"
                   value={form.answerKey}

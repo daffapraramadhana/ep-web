@@ -27,7 +27,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
-import { BookOpen, Pencil, Headphones, FileText } from 'lucide-react';
+import { BookOpen, Pencil, Headphones, FileText, Mic } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { ProgressView, SkillTag } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
@@ -47,6 +47,7 @@ const SKILL_META: Record<SkillTag, SkillMeta> = {
   GRAMMAR: { label: 'Grammar', icon: Pencil, color: 'var(--skill-grammar-deep)' },
   LISTENING: { label: 'Listening', icon: Headphones, color: 'var(--skill-listening-deep)' },
   READING: { label: 'Reading', icon: FileText, color: 'var(--skill-reading-deep)' },
+  SPEAKING: { label: 'Speaking', icon: Mic, color: 'var(--skill-speaking-deep)' },
 };
 
 function ProgressSkeleton() {

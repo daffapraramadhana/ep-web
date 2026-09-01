@@ -40,7 +40,7 @@ export interface UseSessionResult {
   submitError: string;
   /** true selama request submit in-flight — dipakai untuk disable PERIKSA. */
   submitting: boolean;
-  submit(answer: string): Promise<void>;
+  submit(answer: string | Blob): Promise<void>;
   next(): void;
   /** Muat ulang sesi (retry awal saat phase 'error'). */
   reload(): void;
@@ -54,7 +54,10 @@ function buildQueue(view: SessionView): number[] {
     .map(({ idx }) => idx);
 }
 
-export function useSession(replayLessonId: string | null): UseSessionResult {
+export function useSession(
+  replayLessonId: string | null,
+  speaking = false,
+): UseSessionResult {
   const [view, setView] = useState<SessionView | null>(null);
   const [queue, setQueue] = useState<number[]>([]);
   const [currentIdx, setCurrentIdx] = useState<number | null>(null);
@@ -73,7 +76,11 @@ export function useSession(replayLessonId: string | null): UseSessionResult {
     setPhase('loading');
     setLoadError('');
     try {
-      const path = replayLessonId ? '/session/replay' : '/session/today';
+      const path = replayLessonId
+        ? '/session/replay'
+        : speaking
+          ? '/session/speaking'
+          : '/session/today';
       const nextView = await api<SessionView>(path, {
         method: 'POST',
         body: replayLessonId ? JSON.stringify({ lessonId: replayLessonId }) : undefined,
@@ -89,7 +96,7 @@ export function useSession(replayLessonId: string | null): UseSessionResult {
       setLoadError(err instanceof Error ? err.message : 'Terjadi kesalahan');
       setPhase('error');
     }
-  }, [replayLessonId]);
+  }, [replayLessonId, speaking]);
 
   // Guard terhadap React StrictMode dev double-invoke (mount -> cleanup ->
   // mount lagi memanggil effect ini dua kali secara sinkron): tanpa ini,
@@ -101,14 +108,14 @@ export function useSession(replayLessonId: string | null): UseSessionResult {
   // `load()` langsung, bukan lewat effect ini, jadi tidak terkena guard ini.
   const loadedKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    const key = replayLessonId ?? '';
+    const key = replayLessonId ?? (speaking ? 'speaking' : '');
     if (loadedKeyRef.current === key) return;
     loadedKeyRef.current = key;
     load();
-  }, [replayLessonId, load]);
+  }, [replayLessonId, speaking, load]);
 
   const submit = useCallback(
-    async (answer: string) => {
+    async (answer: string | Blob) => {
       // I3 fix: assert the invariant the `slice(1)` math below assumes —
       // `currentIdx` must be the queue's own head. The FE's PERIKSA button
       // is now also disabled during `phase === 'feedback'`, but this guard
@@ -128,10 +135,27 @@ export function useSession(replayLessonId: string | null): UseSessionResult {
       setSubmitting(true);
       setSubmitError('');
       try {
-        const result = await api<AnswerResult>(`/session/${view.id}/answer`, {
-          method: 'POST',
-          body: JSON.stringify({ itemId: item.itemId, answer }),
-        });
+        // UCAPAN mengirim Blob rekaman ke endpoint speak (STT di BE);
+        // tipe lain mengirim string jawaban ke endpoint answer.
+        const result =
+          typeof answer === 'string'
+            ? await api<AnswerResult>(`/session/${view.id}/answer`, {
+                method: 'POST',
+                body: JSON.stringify({ itemId: item.itemId, answer }),
+              })
+            : await (() => {
+                const fd = new FormData();
+                fd.append('itemId', item.itemId);
+                fd.append(
+                  'file',
+                  answer,
+                  answer.type === 'audio/mp4' ? 'record.m4a' : 'record.webm',
+                );
+                return api<AnswerResult>(`/session/${view.id}/speak`, {
+                  method: 'POST',
+                  body: fd,
+                });
+              })();
         // Benar -> keluar dari queue (tidak kembali). Salah -> tetap di
         // queue, didorong ke belakang supaya muncul lagi.
         setQueue((prev) => (result.correct ? prev.slice(1) : [...prev.slice(1), currentIdx]));

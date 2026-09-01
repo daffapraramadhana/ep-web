@@ -118,6 +118,11 @@ export function FeedbackSheet({ open, result, itemId, onNext, onToast }: Feedbac
               </>
             ) : null}
           </p>
+          {shown.transcript ? (
+            <p className="feedback-sheet-transcript">
+              Yang terdeteksi: <strong>“{shown.transcript}”</strong>
+            </p>
+          ) : null}
           <ChunkyButton type="button" variant={correct ? 'good' : 'danger'} onClick={onNext}>
             LANJUT
           </ChunkyButton>

@@ -23,6 +23,7 @@ import { MediaBlock } from '@/components/session/media-block';
 import { AnswerMc } from '@/components/session/answer-mc';
 import { AnswerIsian } from '@/components/session/answer-isian';
 import { AnswerChips } from '@/components/session/answer-chips';
+import { AnswerSpeak } from '@/components/session/answer-speak';
 
 function SessionHeader({
   total,
@@ -63,6 +64,7 @@ function SessionBody() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const replayLessonId = searchParams.get('replay');
+  const speaking = searchParams.get('speaking') === '1';
 
   const {
     currentItem,
@@ -76,13 +78,13 @@ function SessionBody() {
     submit,
     next,
     reload,
-  } = useSession(replayLessonId);
+  } = useSession(replayLessonId, speaking);
 
   // `null` = belum siap (PERIKSA mati) — kontrak `onReady` komponen jawaban
   // per-tipe (Task 11 brief). Direset lewat remount (`key={item.itemId}`
   // di bawah), BUKAN effect ini, supaya state internal komponen (opsi
   // terpilih, chip di zona, dst) ikut ter-reset bersih tiap ganti soal.
-  const [answer, setAnswer] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<string | Blob | null>(null);
   const [muted, setMutedState] = useState<boolean>(() => sfx.getMuted());
   const [toast, setToast] = useState('');
 
@@ -199,6 +201,15 @@ function SessionBody() {
             />
           ) : null}
 
+          {currentItem.type === 'UCAPAN' ? (
+            <AnswerSpeak
+              item={currentItem}
+              disabled={submitting || phase === 'feedback'}
+              result={phase === 'feedback' ? last : null}
+              onReady={setAnswer}
+            />
+          ) : null}
+
           <div className="flex-1" />
 
           <ChunkyButton
@@ -242,6 +253,7 @@ function typeLabel(type: string): string {
   if (type === 'PILIHAN_GANDA') return 'Pilihan ganda';
   if (type === 'ISIAN') return 'Isian';
   if (type === 'SUSUN_KALIMAT') return 'Susun kalimat';
+  if (type === 'UCAPAN') return 'Ucapan';
   return type;
 }
 

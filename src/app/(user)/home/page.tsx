@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlarmClock } from 'lucide-react';
+import { AlarmClock, Mic } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { SummaryView, SessionView, ProgressView } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
@@ -24,6 +24,7 @@ export default function HomePage() {
   const [loadError, setLoadError] = useState('');
   const [error, setError] = useState('');
   const [starting, setStarting] = useState(false);
+  const [startingSpeaking, setStartingSpeaking] = useState(false);
   // Strip "Minggu ini" — non-blocking: beranda tetap tampil utuh bila
   // GET /progress gagal, kartunya saja yang tidak muncul.
   const [week, setWeek] = useState<ProgressView['week'] | null>(null);
@@ -61,6 +62,23 @@ export default function HomePage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
       setStarting(false);
+    }
+  }
+
+  async function startSpeaking() {
+    if (startingSpeaking) return;
+    setError('');
+    setStartingSpeaking(true);
+    try {
+      // Menu "Latihan Berbicara" (kind SPEAKING di BE): sesi berisi soal
+      // UCAPAN dari materi yang belum tuntas. 409 ("Belum ada latihan
+      // berbicara baru untuk levelmu") muncul inline di `error` — kartu
+      // selalu tampil, tidak disembunyikan (butuh flag tambahan di summary).
+      await api<SessionView>('/session/speaking', { method: 'POST' });
+      router.push('/session?speaking=1');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+      setStartingSpeaking(false);
     }
   }
 
@@ -176,6 +194,25 @@ export default function HomePage() {
             ) : null}
           </Card>
         ) : null}
+
+        {/* Menu khusus speaking — kartu selalu tampil; bila materi habis,
+            POST /session/speaking menolak 409 dan pesannya tampil di `error`. */}
+        <Card eyebrow="Latihan" title="Latihan Berbicara">
+          <p className="card-meta">
+            Latih pelafalan dengan soal ucapan. Sesi ini dihitung ke target harian dan
+            streak-mu.
+          </p>
+          <ChunkyButton
+            variant="ghost"
+            onClick={startSpeaking}
+            disabled={startingSpeaking}
+          >
+            <span className="inline-flex items-center gap-2">
+              <Mic size={18} strokeWidth={2.25} />
+              {startingSpeaking ? 'MEMUAT...' : 'BERBICARA'}
+            </span>
+          </ChunkyButton>
+        </Card>
 
         {summary.reviewsDue > 0 ? (
           <button

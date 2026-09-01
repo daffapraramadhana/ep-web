@@ -21,7 +21,7 @@
 // ---------------------------------------------------------------------------
 
 export type Level = 'DASAR' | 'MENENGAH' | 'MAHIR';
-export type SkillTag = 'VOCABULARY' | 'GRAMMAR' | 'LISTENING' | 'READING';
+export type SkillTag = 'VOCABULARY' | 'GRAMMAR' | 'LISTENING' | 'READING' | 'SPEAKING';
 
 // ---------------------------------------------------------------------------
 // GET /session/:id (dan endpoint start sesi) — apps/api/src/session/session.types.ts
@@ -31,18 +31,19 @@ export interface SessionItemView {
   itemId: string;
   source: 'LESSON' | 'REVIEW';
   order: number;
-  type: 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT';
+  type: 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT' | 'UCAPAN';
   prompt: string;
   options: string[] | null;
   mediaUrl: string | null;
   passage: string | null;
   chips: string[] | null; // SUSUN_KALIMAT: kata answerKey sudah di-shuffle di BE
+  targetText: string | null; // UCAPAN: kalimat yang harus diucapkan
   answeredCorrect: boolean;
 }
 
 export interface SessionView {
   id: string;
-  kind: 'DAILY' | 'REPLAY';
+  kind: 'DAILY' | 'REPLAY' | 'SPEAKING';
   status: 'IN_PROGRESS' | 'COMPLETED';
   lessonTitle: string | null;
   items: SessionItemView[];
@@ -57,6 +58,7 @@ export interface AnswerResult {
   correct: boolean;
   explanation: string;
   correctAnswer: string | null; // hanya diisi saat salah
+  transcript: string | null; // UCAPAN: apa yang dideteksi STT
   xpAwarded: number;
   sessionCompleted: boolean;
   summary: null | {
@@ -80,12 +82,14 @@ export interface MeView {
   dailyTargetSessions: number;
   soundOn: boolean;
   onboarded: boolean;
+  voiceConsentAt: string | null;
 }
 
 export interface PatchMeRequest {
   level?: Level;
   dailyTargetSessions?: number;
   soundOn?: boolean;
+  voiceConsent?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -271,7 +275,7 @@ export interface EmployeeDetailView {
 // ---------------------------------------------------------------------------
 
 export type ReportStatus = 'OPEN' | 'RESOLVED';
-export type ItemType = 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT';
+export type ItemType = 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT' | 'UCAPAN';
 export type ItemStatus = 'DRAFT' | 'LIVE' | 'RETIRED';
 
 export interface ItemReportItemView {
