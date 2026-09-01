@@ -1030,6 +1030,25 @@ body {
 
 /* Sesi — ucapan (speaking drill): kalimat target + tombol rekam. Reuse
    gaya .media-audio-*; .speak-rec-btn memakai tema bahaya saat merekam. */
+.speak-listen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--brand-dark);
+  background: var(--brand-soft);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 11px;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+}
+.speak-listen:active {
+  transform: translateY(1px);
+}
 .speak-target {
   background: var(--brand-soft);
   border: 1.5px solid var(--line);

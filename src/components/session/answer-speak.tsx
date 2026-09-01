@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Mic, Pause, Play, RotateCcw } from 'lucide-react';
+import { Mic, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
 import type { AnswerResult, SessionItemView } from '@/lib/api-types';
 
 type RecState = 'idle' | 'recording' | 'recorded';
@@ -56,9 +56,31 @@ export function AnswerSpeak({ item, disabled, result, onReady }: AnswerSpeakProp
     streamRef.current = null;
   }
 
-  // Cleanup saat unmount / pindah soal: hentikan stream, jangan bocorkan
-  // mikrofon. (Blob yang sudah jadi tidak perlu di-revoke — pendek singkat.)
-  useEffect(() => stopTracks, []);
+  // Cleanup saat unmount / pindah soal: hentikan stream (jangan bocorkan
+  // mikrofon) + cancel TTS yang sedang berbunyi. (Blob yang sudah jadi tidak
+  // perlu di-revoke — pendek singkat.)
+  useEffect(() => {
+    return () => {
+      stopTracks();
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  // TTS contoh ucapan (Web Speech API, tanpa backend) — Dengarkan contoh.
+  // Browser native; nol asset audio. ponytail: kalau butuh audio yang konsisten
+  // antar-perangkat, ganti ke audio hasil generate yang disimpan di item.mediaFile.
+  const canSpeak =
+    typeof window !== 'undefined' && 'speechSynthesis' in window && !!item.targetText;
+
+  function speakTarget() {
+    const u = new SpeechSynthesisUtterance(item.targetText!);
+    u.lang = 'en-US';
+    u.rate = 0.85;
+    window.speechSynthesis.cancel(); // hentikan yang sedang berjalan, ganti yang baru
+    window.speechSynthesis.speak(u);
+  }
 
   function stopRecording() {
     const recorder = recorderRef.current;
@@ -133,6 +155,15 @@ export function AnswerSpeak({ item, disabled, result, onReady }: AnswerSpeakProp
 
   return (
     <div className="mb-5">
+      {canSpeak && (
+        <div className="mb-2 flex justify-end">
+          <button type="button" className="speak-listen" onClick={speakTarget}>
+            <Volume2 size={15} strokeWidth={2.5} />
+            Dengarkan contoh
+          </button>
+        </div>
+      )}
+
       <div className="speak-target" aria-hidden="true">
         <p className="mb-1 text-[11px] font-extrabold uppercase tracking-wider text-muted">
           Baca dengan lantang
