@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlarmClock, Mic } from 'lucide-react';
+import { AlarmClock, Mic, MessagesSquare } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { SummaryView, SessionView, ProgressView } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
@@ -213,6 +213,28 @@ export default function HomePage() {
             </span>
           </ChunkyButton>
         </Card>
+
+        {/* Talking agent — kartu TERPISAH (keputusan desain §5 plan): bukan
+            latihan soal, percakapan bebas dua arah. Hanya tampil bila flag
+            VOICE_AGENT_ENABLED nyala di config BE (soft-launch tanpa deploy). */}
+        {summary.voiceAgentEnabled ? (
+          <Card eyebrow="Ngobrol" title="Ngobrol dengan AI">
+            <p className="card-meta">
+              Percakapan suara langsung dengan AI tutor. Bedanya dari Latihan
+              Berbicara: ini ngobrol bebas, bukan menjawab soal. XP didapat
+              saat percakapan cukup panjang.
+            </p>
+            <ChunkyButton
+              variant="ghost"
+              onClick={() => router.push('/talk')}
+            >
+              <span className="inline-flex items-center gap-2">
+                <MessagesSquare size={18} strokeWidth={2.25} />
+                NGROBOL
+              </span>
+            </ChunkyButton>
+          </Card>
+        ) : null}
 
         {summary.reviewsDue > 0 ? (
           <button

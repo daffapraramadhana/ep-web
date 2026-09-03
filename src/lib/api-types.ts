@@ -122,6 +122,30 @@ export interface SummaryView {
   contentExhausted: boolean;
   nextLesson: NextLessonView | null;
   openSession: OpenSessionView | null;
+  /** talking agent aktif (config VOICE_AGENT_ENABLED di BE) — kartu
+   *  "Ngobrol dengan AI" di Beranda tampil hanya bila true. */
+  voiceAgentEnabled: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Talking agent — POST /voice-conversation/start, GET /voice-conversation/:id
+// (apps/api/src/voice-conversation/voice-conversation.service.ts)
+// ---------------------------------------------------------------------------
+
+export interface VoiceConversationStartView {
+  signedUrl: string;
+  conversationRecordId: string;
+  dynamicVariables: {
+    fluen_conversation_id: string;
+    fluen_user_id: string;
+  };
+}
+
+export interface VoiceConversationStatusView {
+  status: 'PENDING' | 'GRADED';
+  passed: boolean | null;
+  xpAwarded: number;
+  durationSecs: number | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -167,7 +191,14 @@ export interface ProgressWeekDayView {
 export interface ProgressView {
   skills: ProgressSkillView[];
   week: ProgressWeekDayView[];
-  totals: { lessonsDone: number; xpTotal: number; longestStreak: number };
+  totals: {
+    lessonsDone: number;
+    xpTotal: number;
+    longestStreak: number;
+    /** talking agent — percakapan GRADED & menit ngobrol (lifetime) */
+    voiceConversations: number;
+    voiceMinutes: number;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -203,6 +234,15 @@ export interface ExhaustedByLevelView {
   users: number;
 }
 
+export interface VoiceReportView {
+  conversations7d: number;
+  uniqueUsers7d: number;
+  minutes7d: number;
+  /** null bila conversations7d === 0 (hindari 0% menyesatkan dari 0 sampel) */
+  passRate7d: number | null;
+  costCredits7d: number;
+}
+
 export interface OverviewView {
   totals: OverviewTotals;
   activitySeries: ActivitySeriesPoint[];
@@ -211,6 +251,8 @@ export interface OverviewView {
     exhaustedByLevel: ExhaustedByLevelView[];
   };
   openReports: number;
+  /** talking agent — agregat org-wide 7 hari (tanpa rincian per-orang) */
+  voice: VoiceReportView;
 }
 
 // ---------------------------------------------------------------------------
@@ -264,6 +306,9 @@ export interface EmployeeDetailView {
   streak: number;
   longestStreak: number;
   xpTotal: number;
+  /** talking agent — percakapan GRADED & menit ngobrol (lifetime) */
+  voiceConversations: number;
+  voiceMinutes: number;
   calendar: CalendarDayView[];
   skills: EmployeeSkillView[];
   lessonHistory: LessonHistoryView[];
