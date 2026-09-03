@@ -14,7 +14,8 @@
  * 2. Kartu "Minggu Ini": 7 hari (BE mengirim Senin->Minggu terurut, lihat
  *    ProgressWeekDayView) + emoji 🔥 aktif / 🧊 diselamatkan freeze / ·
  *    kosong. Emoji dipertahankan di sini (aturan kalender streak, §5).
- * 3. Kartu ringkas total (lesson selesai · total XP · streak terpanjang).
+ * 3. Kartu ringkas total (lesson selesai · total XP · streak terpanjang ·
+ *    percakapan AI · menit ngobrol).
  *
  * Kontras (§7 "Kontras teks ≥ 4.5:1" — aturan tanpa syarat, bukan cuma
  * utk amber): semua 4 baris memakai teks/ikon/Ring PUTIH di atas token
@@ -174,6 +175,14 @@ export default function ProgressPage() {
           <div className="totals-item">
             <div className="totals-value">{progress.totals.longestStreak}</div>
             <div className="totals-label">Streak terpanjang</div>
+          </div>
+          <div className="totals-item">
+            <div className="totals-value">{progress.totals.voiceConversations}</div>
+            <div className="totals-label">Percakapan AI</div>
+          </div>
+          <div className="totals-item">
+            <div className="totals-value">{progress.totals.voiceMinutes}</div>
+            <div className="totals-label">Menit ngobrol</div>
           </div>
         </div>
       </Card>

@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { Flag } from 'lucide-react';
+import { Flag, MessagesSquare } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { OverviewView } from '@/lib/api-types';
 import { Card } from '@/components/ui';
@@ -72,6 +73,24 @@ export default function RingkasanPage() {
               href="/admin/karyawan?status=butuh_perhatian"
             />
             <StatCard label="Belum Mulai" value={data.totals.notStarted} />
+          </div>
+
+          <div className="mb-1 flex items-center gap-2 text-sm font-black text-ink">
+            <MessagesSquare size={15} strokeWidth={2.5} className="text-brand" />
+            Ngobrol dengan AI
+          </div>
+          <p className="mb-3 text-xs font-semibold text-muted">
+            Percakapan talking agent, 7 hari terakhir.
+          </p>
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <StatCard label="Percakapan" value={data.voice.conversations7d} />
+            <StatCard label="Pengguna unik" value={data.voice.uniqueUsers7d} />
+            <StatCard label="Total menit" value={data.voice.minutes7d} />
+            <StatCard
+              label="Tingkat lulus"
+              value={data.voice.passRate7d === null ? '—' : `${data.voice.passRate7d}%`}
+            />
+            <StatCard label="Kredit terpakai" value={data.voice.costCredits7d} />
           </div>
 
           <Card title="Sesi selesai per hari (28 hari)" className="mb-6">
@@ -153,7 +172,7 @@ function StatCard({
   caption,
 }: {
   label: string;
-  value: number;
+  value: ReactNode;
   amber?: boolean;
   href?: string;
   caption?: string;

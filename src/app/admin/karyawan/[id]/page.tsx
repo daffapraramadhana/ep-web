@@ -4,7 +4,7 @@
  * /admin/karyawan/[id] — detail karyawan (Task 5, spec §5). Consumes GET
  * /admin/monitoring/employees/:id (EmployeeDetailView, api-types.ts).
  *
- * 4 blok, atas ke bawah:
+ * 5 blok, atas ke bawah:
  * 1. Header identitas (nama · email · level · bergabung) + 3 stat mini-card
  *    (streak · streak terpanjang · total XP), pola `.admin-stat-value`
  *    (Card eyebrow) yang sama dgn Ringkasan (Task 4).
@@ -14,7 +14,9 @@
  *    (`.skill-row`, token `--skill-*-deep`, Ring akurasi putih); baris tanpa
  *    data (`accuracy === null`) pakai varian `.skill-row-empty` "Belum ada
  *    data" (sudah begitu di progress.tsx, bukan style baru).
- * 4. Riwayat lesson (judul · topic · tanggal · akurasi%); array kosong ->
+ * 4. Ngobrol dengan AI — percakapan talking agent (lifetime) dua stat
+ *    mini-card (pola header blok 1): jumlah percakapan & menit ngobrol.
+ * 5. Riwayat lesson (judul · topic · tanggal · akurasi%); array kosong ->
  *    teks "Belum ada data".
  */
 
@@ -22,7 +24,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { BookOpen, Pencil, Headphones, FileText, Mic } from 'lucide-react';
+import { BookOpen, Pencil, Headphones, FileText, Mic, MessagesSquare } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { EmployeeDetailView, EmployeeSkillView, SkillTag } from '@/lib/api-types';
 import { Card } from '@/components/ui';
@@ -174,6 +176,24 @@ export default function KaryawanDetailPage() {
               ))}
             </div>
           </Card>
+
+          <div className="mb-6">
+            <div className="mb-1 flex items-center gap-2 text-sm font-black text-ink">
+              <MessagesSquare size={15} strokeWidth={2.5} className="text-brand" />
+              Ngobrol dengan AI
+            </div>
+            <p className="mb-3 text-xs font-semibold text-muted">
+              Percakapan talking agent karyawan ini (seumur hidup).
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <Card eyebrow="Percakapan">
+                <div className="admin-stat-value">{data.voiceConversations}</div>
+              </Card>
+              <Card eyebrow="Menit ngobrol">
+                <div className="admin-stat-value">{data.voiceMinutes}</div>
+              </Card>
+            </div>
+          </div>
 
           <Card title="Riwayat lesson">
             {data.lessonHistory.length === 0 ? (
