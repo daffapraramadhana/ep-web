@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import { APP_NAME } from "@/lib/brand";
 import "./globals.css";
+import "./learner.css";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -9,7 +11,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Fluen — Belajar Bahasa Inggris Harian",
+  title: `${APP_NAME} — Belajar Bahasa Inggris Harian`,
+  applicationName: APP_NAME,
   description: "Platform pembelajaran bahasa Inggris harian untuk karyawan.",
 };
 

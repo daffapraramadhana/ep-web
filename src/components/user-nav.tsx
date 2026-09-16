@@ -2,23 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Map, ChartColumn, User, LogOut } from 'lucide-react';
-import type { ComponentType } from 'react';
+import { Home, Map, ChartColumn, User, LogOut, Check, Flame } from 'lucide-react';
+import type { ComponentType, CSSProperties } from 'react';
 import { useMe, resetMe } from '@/lib/use-me';
 import { useSummary, resetSummary } from '@/lib/use-summary';
 import { Ring } from '@/components/progress';
 import { Logo } from '@/components/logo';
+import { APP_NAME } from '@/lib/brand';
 
 /**
- * Nav app user — design-system.md §2 "Navigasi": pill navy mengambang
- * (mobile) yang menjadi sidebar kiri di desktop (>=1024px).
- *
- * Desktop "premium" (impeccable craft): permukaan gradien navy + garis
- * highlight tepi kanan; item aktif memakai idiom chunky (border-bottom
- * brand-dark + tekan-turun); blok target harian (ring mini dari
- * /me/summary via useSummary — fetch dibagi dengan rail); blok user
- * dengan ring avatar gradien + baris streak. Semua elemen desktop
- * disembunyikan di mobile (display:none), pill mobile tak berubah.
+ * Learner navigation: floating pill with active label on mobile, white sidebar
+ * from 1024px. Desktop goal and account details share the summary cache
+ * with the progress rail; learner.css owns the responsive presentation.
  */
 
 interface NavItem {
@@ -39,6 +34,7 @@ export function UserNav() {
   const router = useRouter();
   const { me } = useMe();
   const { summary } = useSummary();
+  const activeIndex = NAV_ITEMS.findIndex(({ href }) => pathname === href || pathname.startsWith(`${href}/`));
 
   const name = me?.name ?? '';
   const initial = name.trim().charAt(0).toUpperCase() || '?';
@@ -62,23 +58,28 @@ export function UserNav() {
         <span className="user-nav-brand-icon">
           <Logo size={25} />
         </span>
-        Fluen
+        {APP_NAME}
       </div>
 
-      <div className="user-nav-items">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(`${href}/`);
+      <div
+        className="user-nav-items"
+        data-active-index={activeIndex}
+        style={{ '--nav-active-index': Math.max(0, activeIndex) } as CSSProperties}
+      >
+        {NAV_ITEMS.map(({ href, label, icon: Icon }, index) => {
+          const active = index === activeIndex;
           return (
             <Link
               key={href}
               href={href}
+              aria-label={label}
               className={`user-nav-item${active ? ' user-nav-item-active' : ''}`}
               aria-current={active ? 'page' : undefined}
             >
-              <span className="user-nav-icon">
+              <span className="user-nav-icon" aria-hidden="true">
                 <Icon size={20} strokeWidth={2.25} />
               </span>
-              <span>{label}</span>
+              <span className="user-nav-label">{label}</span>
             </Link>
           );
         })}
@@ -96,7 +97,7 @@ export function UserNav() {
           <div className="user-nav-goal-text">
             <b>Target hari ini</b>
             <span>
-              {done}/{target} sesi{targetMet ? ' ✅' : ''}
+              {done}/{target} sesi{targetMet ? <Check size={13} aria-label="Target tercapai" /> : null}
             </span>
           </div>
         </div>
@@ -112,7 +113,7 @@ export function UserNav() {
           </div>
           <div className="user-nav-user-streak">
             {summary && summary.streak > 0
-              ? `🔥 ${summary.streak} hari`
+              ? <><Flame size={13} aria-hidden="true" /> {summary.streak} hari</>
               : summary
                 ? 'Belum ada streak'
                 : ''}

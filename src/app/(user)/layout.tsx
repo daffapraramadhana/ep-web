@@ -75,17 +75,17 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   }
 
   const showNav = !isNavHidden(pathname);
+  const showRail = pathname === '/home';
 
   return (
-    <div className={showNav ? 'user-shell' : ''}>
+    <div className={showNav ? 'learner-ui user-shell' : 'learner-ui'}>
       <main className={showNav ? 'min-h-screen pb-28 lg:pb-6' : 'min-h-screen'}>
         {showNav ? (
-          /* Desktop: dua kolom — konten utama 640px + rail widget 300px,
-             satu blok terpusat di area kanan sidebar. Mobile tak berubah
-             (rail display:none di bawah lg). */
-          <div className="lg:mx-auto lg:flex lg:max-w-[1010px] lg:justify-center lg:gap-6 lg:px-6 lg:pt-6">
-            <div className="min-w-0 lg:w-full lg:max-w-[640px]">{children}</div>
-            <DesktopRail />
+          /* Only Home gets a desktop rail. Other pages keep a centered,
+             readable main column without duplicate progress widgets. */
+          <div className="learn-workspace">
+            <div className="learn-main-column">{children}</div>
+            {showRail ? <DesktopRail /> : null}
           </div>
         ) : (
           /* Sesi & onboarding: kolom fokus tanpa rail — di sini rasa

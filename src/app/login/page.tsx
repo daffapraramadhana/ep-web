@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { ChunkyButton } from '@/components/ui';
 import { AuthShell } from '@/components/auth-shell';
+import { Mascot } from '@/components/mascot';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+import './login.css';
 
 /**
  * Login user-facing (Task 8 brief) — form sama dengan `/admin/login` tapi
@@ -27,9 +30,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setError('');
     setLoading(true);
     try {
@@ -43,7 +48,9 @@ export default function LoginPage() {
       localStorage.setItem('name', res.name);
       router.replace('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+      setError(err instanceof TypeError
+        ? 'Belum bisa terhubung. Periksa koneksimu, lalu coba masuk lagi.'
+        : err instanceof Error ? err.message : 'Belum berhasil masuk. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -51,27 +58,37 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      title="Masuk"
-      subtitle="Sedikit tiap hari, lama-lama jadi bukit."
+      className="auth-login"
+      intro={<div className="login-welcome">
+        <p>Langkah kecil.<br /><strong>Percaya diri lebih besar.</strong></p>
+        <Mascot variant="welcome" className="login-mascot" sizes="128px" priority />
+      </div>}
+      title="Selamat datang kembali."
+      subtitle="Masuk untuk melanjutkan perjalanan belajarmu."
       footer={
         <>
           Belum punya akun?{' '}
           <Link href="/register" className="underline">
-            Daftar di sini
+            Buat akun
           </Link>
         </>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="login-form" aria-busy={loading}>
         <div>
           <label htmlFor="email" className="auth-label">
             Email
           </label>
           <input
             id="email"
+            name="email"
             type="email"
+            inputMode="email"
+            autoCapitalize="none"
+            spellCheck={false}
             required
             autoComplete="email"
+            placeholder="nama@contoh.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="auth-input"
@@ -79,17 +96,30 @@ export default function LoginPage() {
         </div>
         <div>
           <label htmlFor="password" className="auth-label">
-            Kata Sandi
+            Kata sandi
           </label>
-          <input
-            id="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="auth-input"
-          />
+          <div className="login-password">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              required
+              autoComplete="current-password"
+              placeholder="Masukkan kata sandimu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="auth-input"
+            />
+            <button
+              type="button"
+              className="login-password-toggle"
+              aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+              aria-controls="password"
+              onClick={() => setShowPassword(value => !value)}
+            >
+              {showPassword ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
+            </button>
+          </div>
         </div>
         {error && (
           <p className="auth-error" role="alert">
@@ -97,8 +127,9 @@ export default function LoginPage() {
           </p>
         )}
         <ChunkyButton type="submit" disabled={loading}>
-          {loading ? 'Memproses...' : 'Masuk'}
+          {loading ? 'Sedang masuk…' : <>Masuk <ArrowRight size={18} aria-hidden="true" /></>}
         </ChunkyButton>
+        <span className="sr-only" role="status">{loading ? 'Sedang masuk. Mohon tunggu.' : ''}</span>
       </form>
     </AuthShell>
   );

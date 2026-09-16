@@ -1,0 +1,51 @@
+/* Login-only polish. Register and admin keep the existing AuthShell styling. */
+.auth-login {
+  min-height: 100svh;
+  padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.auth-login .auth-box { max-width: 440px; }
+.auth-login .hero-anim { animation: none; }
+.auth-login .auth-wordmark { margin-bottom: 20px; font-size: 22px; }
+.auth-login .auth-card { padding: 0 28px 28px; overflow: hidden; }
+.auth-login .login-welcome {
+  margin: 0 -28px 28px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--brand-soft);
+  border-bottom: 1px solid var(--line);
+}
+.auth-login .login-welcome p { font-size: 14px; line-height: 1.6; color: var(--brand-dark); }
+.auth-login .login-welcome strong { font-weight: 800; }
+.auth-login .login-mascot { width: 128px; height: 128px; object-fit: contain; flex-shrink: 0; }
+.auth-login .auth-title { font-size: 26px; line-height: 1.25; letter-spacing: -0.6px; }
+.auth-login .auth-subtitle { margin: 8px 0 24px; font-size: 14px; line-height: 1.6; font-weight: 600; }
+.auth-login .login-form { display: grid; gap: 20px; }
+.auth-login .auth-label { font-size: 14px; margin-bottom: 8px; }
+.auth-login .auth-input { min-height: 52px; font-size: 16px; font-weight: 600; border-width: 1px; background: #fff; }
+.auth-login .auth-input::placeholder { color: var(--muted); opacity: 1; }
+.auth-login .login-password { position: relative; }
+.auth-login .login-password .auth-input { padding-right: 56px; }
+.auth-login .login-password-toggle {
+  position: absolute; right: 4px; top: 4px; width: 44px; height: 44px;
+  display: grid; place-items: center; border-radius: 10px; color: var(--muted); cursor: pointer;
+}
+.auth-login .login-password-toggle:hover { background: var(--brand-soft); color: var(--brand-dark); }
+.auth-login .login-password-toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.auth-login .login-form > .btn { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 52px; }
+.auth-login .auth-foot { margin-top: 12px; font-size: 14px; }
+.auth-login .auth-foot a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 380px) {
+  .auth-login .auth-card { padding: 0 20px 24px; }
+  .auth-login .login-welcome { margin: 0 -20px 24px; padding: 12px 16px; gap: 8px; }
+  .auth-login .login-mascot { width: 104px; height: 104px; }
+  .auth-login .login-welcome p { font-size: 12px; }
+  .auth-login .auth-title { font-size: 24px; }
+}
+@media (max-height: 700px) {
+  .auth-login { align-items: flex-start; }
+  .auth-login .auth-wordmark { margin-bottom: 12px; }
+  .auth-login .login-mascot { width: 104px; height: 104px; }
+}

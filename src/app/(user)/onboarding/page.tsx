@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
 import type { Level, MeView, PatchMeRequest } from '@/lib/api-types';
 import { ChunkyButton } from '@/components/ui';
+import { Mascot } from '@/components/mascot';
 
 /**
  * Onboarding (Task 9 brief §Step 1) — 2 langkah, state lokal, satu route
@@ -82,9 +83,14 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg px-4 py-8">
+    <div className="learn-onboarding flex min-h-screen items-center justify-center bg-bg px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="mb-5 flex justify-center gap-2">
+        <div className="learn-onboarding-intro">
+          <Mascot sizes="144px" priority />
+          <p>{step === 1 ? 'Kita mulai dari tempat yang nyaman untukmu.' : 'Pilih ritme yang bisa kamu nikmati setiap hari.'}</p>
+        </div>
+        <p className="learn-eyebrow mb-3">Langkah {step} dari 2</p>
+        <div className="mb-5 flex gap-2" aria-hidden="true">
           <div className={`h-1.5 w-10 rounded-full ${step >= 1 ? 'bg-brand' : 'bg-line'}`} />
           <div className={`h-1.5 w-10 rounded-full ${step >= 2 ? 'bg-brand' : 'bg-line'}`} />
         </div>
@@ -95,26 +101,24 @@ export default function OnboardingPage() {
             <p className="mb-5 text-sm font-semibold text-muted">
               Kami akan menyesuaikan materi dengan levelmu. Bisa diubah kapan pun di Profil.
             </p>
-            <div className="space-y-3">
+            <fieldset className="space-y-3" aria-label="Level bahasa Inggris">
               {LEVEL_OPTIONS.map((opt) => {
                 const selected = level === opt.value;
                 return (
-                  <button
+                  <label
                     key={opt.value}
-                    type="button"
                     className={`choice-card${selected ? ' choice-card-selected' : ''}`}
-                    onClick={() => setLevel(opt.value)}
-                    aria-pressed={selected}
                   >
+                    <input type="radio" name="level" value={opt.value} checked={selected} onChange={() => setLevel(opt.value)} className="sr-only" />
                     <div className="choice-card-title">{opt.label}</div>
                     <div className="choice-card-desc">{opt.desc}</div>
-                  </button>
+                  </label>
                 );
               })}
-            </div>
+            </fieldset>
             <div className="mt-6">
               <ChunkyButton onClick={() => setStep(2)} disabled={!level}>
-                LANJUT
+                Lanjut
               </ChunkyButton>
             </div>
           </div>
@@ -125,23 +129,21 @@ export default function OnboardingPage() {
               Target menentukan berapa sesi yang perlu kamu selesaikan tiap hari agar streak tetap
               menyala.
             </p>
-            <div className="space-y-3">
+            <fieldset className="space-y-3" aria-label="Target harian">
               {TARGET_OPTIONS.map((opt) => {
                 const selected = dailyTarget === opt.value;
                 return (
-                  <button
+                  <label
                     key={opt.value}
-                    type="button"
                     className={`choice-card${selected ? ' choice-card-selected' : ''}`}
-                    onClick={() => setDailyTarget(opt.value)}
-                    aria-pressed={selected}
                   >
+                    <input type="radio" name="daily-target" value={opt.value} checked={selected} onChange={() => setDailyTarget(opt.value)} className="sr-only" />
                     <div className="choice-card-title">{opt.label}</div>
                     <div className="choice-card-desc">{opt.desc}</div>
-                  </button>
+                  </label>
                 );
               })}
-            </div>
+            </fieldset>
             <label className={`consent-card${consented ? ' consent-card-checked' : ''}`}>
               <input
                 type="checkbox"
@@ -157,13 +159,13 @@ export default function OnboardingPage() {
                 berbicara.
               </span>
             </label>
-            {error ? <p className="mt-3 text-sm font-semibold text-bad">{error}</p> : null}
+            {error ? <p role="alert" className="mt-3 text-sm font-semibold text-bad">{error}</p> : null}
             <div className="mt-6 space-y-2.5">
               <ChunkyButton onClick={finish} disabled={saving || !consented}>
-                {saving ? 'MENYIMPAN...' : 'MULAI BELAJAR'}
+                {saving ? 'Menyimpan…' : 'Mulai belajar'}
               </ChunkyButton>
               <ChunkyButton variant="ghost" onClick={() => setStep(1)} disabled={saving}>
-                KEMBALI
+                Kembali
               </ChunkyButton>
             </div>
           </div>

@@ -11,7 +11,7 @@
  * `/session?replay=<lessonId>`; useSession di halaman sesi yang memanggil
  * POST /session/replay sendiri begitu melihat query param itu (lihat
  * use-session.ts) — halaman ini TIDAK memanggilnya langsung. Tap node
- * 'locked' -> shake (ditangani di JourneyPath) + toast singkat.
+ * 'locked' -> penjelasan singkat tanpa membuat sesi baru.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -20,19 +20,12 @@ import { api } from '@/lib/api';
 import type { JourneyLessonView, JourneyView } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
 import { JourneyPath } from '@/components/journey-path';
+import { LearningCompanion, LearningPageSkeleton } from '@/components/learning-companion';
+import { ArrowRight, BookOpen } from 'lucide-react';
+import Link from 'next/link';
 
 function JourneySkeleton() {
-  return (
-    <div className="space-y-4 p-5">
-      <div className="skeleton h-11 rounded-2xl" />
-      {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="flex items-center gap-4">
-          <div className="skeleton h-16 w-16 shrink-0 rounded-full" />
-          <div className="skeleton h-4 w-40 rounded-full" />
-        </div>
-      ))}
-    </div>
-  );
+  return <LearningPageSkeleton title="Perjalanan" />;
 }
 
 export default function JourneyPage() {
@@ -81,7 +74,7 @@ export default function JourneyPage() {
   }
 
   function tapLocked() {
-    setToast('Selesaikan lesson sebelumnya dulu');
+    setToast('Selesaikan materi sebelumnya untuk membuka langkah ini.');
   }
 
   function confirmReplay() {
@@ -112,8 +105,23 @@ export default function JourneyPage() {
     return null;
   }
 
+  const lessons = journey.topics.flatMap(topic => topic.lessons);
+  const completed = lessons.filter(lesson => lesson.state === 'done').length;
+  const next = lessons.find(lesson => lesson.state === 'now');
+  const allDone = lessons.length > 0 && completed === lessons.length;
+
   return (
-    <div>
+    <div className="learn-page learn-journey-page">
+      <header className="learn-page-heading"><p className="learn-eyebrow">Satu langkah setiap hari</p><h1>Perjalanan belajarmu</h1><p>Ikuti ritmemu. Setiap materi membuka langkah baru.</p></header>
+      <LearningCompanion
+        variant={allDone ? 'achieving' : 'exploring'}
+        title={next?.title ?? (allDone ? 'Lihat sejauh apa kamu melangkah.' : 'Langkah pertamamu menanti.')}
+        description={next ? 'Ini materi berikutnya untukmu. Sedikit latihan hari ini, lebih percaya diri esok hari.' : allDone ? 'Semua materi di levelmu sudah selesai. Pilih materi di bawah untuk menguatkan ingatanmu.' : 'Materi untuk levelmu sedang disiapkan. Kembali ke Beranda untuk melihat latihan yang tersedia.'}
+        message={allDone ? 'Bangga dengan langkahmu!' : 'Kita jelajahi bersama.'}
+        footer={<div className="learn-route-progress"><span><BookOpen size={18} aria-hidden="true" /><b>{completed}</b> dari {lessons.length} materi selesai</span>{lessons.length > 0 && <progress value={completed} max={lessons.length} aria-label="Materi yang selesai di perjalanan ini" />}</div>}
+      >
+        {next ? <ChunkyButton onClick={tapNow} disabled={startingNow} aria-busy={startingNow}>{startingNow ? 'Menyiapkan sesi…' : 'Mulai belajar'}<ArrowRight size={18} aria-hidden="true" /></ChunkyButton> : <Link className="learn-text-link" href={allDone ? '/progress' : '/home'}>{allDone ? 'Lihat kemajuanmu' : 'Ke Beranda'}<ArrowRight size={17} aria-hidden="true" /></Link>}
+      </LearningCompanion>
       <JourneyPath
         topics={journey.topics}
         nowDisabled={startingNow}
@@ -127,7 +135,7 @@ export default function JourneyPage() {
           <Card
             className="journey-confirm-card"
             onClick={(e) => e.stopPropagation()}
-            title="Ulangi lesson ini?"
+            title="Ulangi materi ini?"
           >
             <p className="mb-4 text-sm font-semibold text-muted">
               XP dihitung sebagai ulangan.
@@ -140,7 +148,7 @@ export default function JourneyPage() {
               >
                 Batal
               </ChunkyButton>
-              <ChunkyButton variant="good" className="flex-1" onClick={confirmReplay}>
+              <ChunkyButton className="flex-1" onClick={confirmReplay}>
                 Ulangi
               </ChunkyButton>
             </div>

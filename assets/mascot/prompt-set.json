@@ -1,0 +1,99 @@
+{
+  "mode": "built-in imagegen",
+  "useCase": "background-extraction",
+  "source": "ChatGPT Image Sep 14, 2026, 06_14_04 PM.png",
+  "note": "Normalized record of the per-asset prompt set. AI-assisted cutouts, not literal pixel crops.",
+  "sharedConstraints": "Extract only the named figure from its specified row of the edit-target character sheet. One isolated mascot on a square canvas with modest 8% padding. Preserve expression, pose, proportions, gold graduation cap, cream pages, green left/orange right book cover, blue/purple speech-bubble wings, white gloves, 3D shading and associated props. Remove other figures, labels, panels, logos, sheet background and ground plane. Genuine transparent PNG alpha, not drawn checkerboard or solid backdrop. No redesign or unrelated elements. Expression busts: no added legs. Action poses: keep whole figure and props uncut.",
+  "variants": [
+    {
+      "name": "happy",
+      "row": "EXPRESSIONS",
+      "position": 1,
+      "subject": "Open eyes, smiling mouth, waving glove and gold excitement marks."
+    },
+    {
+      "name": "excited",
+      "row": "EXPRESSIONS",
+      "position": 2,
+      "subject": "Happy closed eyes, open laughing smile, raised arms and gold excitement marks."
+    },
+    {
+      "name": "curious",
+      "row": "EXPRESSIONS",
+      "position": 3,
+      "subject": "Inquisitive open eyes, small smile, glove at chin and blue question mark."
+    },
+    {
+      "name": "thinking",
+      "row": "EXPRESSIONS",
+      "position": 4,
+      "subject": "Thoughtful open eyes, small smile, glove at chin, no question mark."
+    },
+    {
+      "name": "proud",
+      "row": "EXPRESSIONS",
+      "position": 5,
+      "subject": "Open happy eyes and smile, hugging a gold five-point star with small sparkle."
+    },
+    {
+      "name": "cheerful",
+      "row": "EXPRESSIONS",
+      "position": 6,
+      "subject": "Happy closed eyes, laughing mouth, fists near book corners and gold excitement marks."
+    },
+    {
+      "name": "surprised",
+      "row": "EXPRESSIONS",
+      "position": 7,
+      "subject": "Wide open eyes, O-shaped mouth and red-orange exclamation mark."
+    },
+    {
+      "name": "winking",
+      "row": "EXPRESSIONS",
+      "position": 8,
+      "subject": "One eye winking, open smile, two thumbs up and gold excitement marks."
+    },
+    {
+      "name": "welcome",
+      "row": "ACTIONS / USAGE",
+      "position": 1,
+      "subject": "Full-body standing mascot waving, happy open eyes and smile, white shoes and a cream-gold bubble reading Hi!"
+    },
+    {
+      "name": "learning",
+      "row": "ACTIONS / USAGE",
+      "position": 2,
+      "subject": "Seated mascot with happy closed eyes, reading an open blue book, with three colorful books stacked beside it."
+    },
+    {
+      "name": "speaking",
+      "row": "ACTIONS / USAGE",
+      "position": 3,
+      "subject": "Standing mascot with happy open eyes, gesturing toward a three-dot outlined speech bubble, gold question mark near cap."
+    },
+    {
+      "name": "achieving",
+      "row": "ACTIONS / USAGE",
+      "position": 4,
+      "subject": "Happy closed-eye full-body mascot holding gold star trophy, one leg lifted, gold sparkles."
+    },
+    {
+      "name": "daily-streak",
+      "row": "ACTIONS / USAGE",
+      "position": 5,
+      "subject": "Happy closed-eye mascot beside cream calendar with orange-red binding and orange flame icon, gold sparkles."
+    },
+    {
+      "name": "exploring",
+      "row": "ACTIONS / USAGE",
+      "position": 6,
+      "subject": "Walking open-eyed happy mascot wearing blue backpack and holding unfolded terrain map with red-orange pin."
+    },
+    {
+      "name": "celebrating",
+      "row": "ACTIONS / USAGE",
+      "position": 7,
+      "subject": "Jumping mascot with happy closed eyes, laughing mouth, both arms raised, one leg up, colorful confetti."
+    }
+  ]
+}

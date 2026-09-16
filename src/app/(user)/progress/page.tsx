@@ -1,68 +1,22 @@
 'use client';
 
-/**
- * Progress — Task 14 brief + design-system.md §2 ("Bar skill"), §5 (ikon
- * skill Lucide, strokeWidth 2.25), §7 (kontras). Consumes GET /progress
- * (ProgressView, lihat api-types.ts). Error/retry & skeleton MENIRU pola
- * Beranda (home/page.tsx) persis.
- *
- * 3 blok, atas ke bawah:
- * 1. 4 baris skill berwarna penuh (token --skill-*-deep) + ikon + ring %
- *    putih (akurasi percobaan-pertama). `accuracy === null` (belum ada
- *    attempt utk skill itu) -> baris abu netral "Belum ada data", bukan
- *    warna skill (status tidak boleh warna saja — §7).
- * 2. Kartu "Minggu Ini": 7 hari (BE mengirim Senin->Minggu terurut, lihat
- *    ProgressWeekDayView) + emoji 🔥 aktif / 🧊 diselamatkan freeze / ·
- *    kosong. Emoji dipertahankan di sini (aturan kalender streak, §5).
- * 3. Kartu ringkas total (lesson selesai · total XP · streak terpanjang ·
- *    percakapan AI · menit ngobrol).
- *
- * Kontras (§7 "Kontras teks ≥ 4.5:1" — aturan tanpa syarat, bukan cuma
- * utk amber): semua 4 baris memakai teks/ikon/Ring PUTIH di atas token
- * `--skill-*-deep` (bukan `--skill-*` biasa, yang cuma aman dipakai sbg
- * aksen di atas latar terang) — varian -700 yang tiap satunya sudah
- * diverifikasi >=4.5:1 terhadap putih (lihat fix report task-14).
- * Sebelumnya Listening (amber) memakai teks gelap sbg workaround; kini
- * tidak perlu lagi karena latarnya sendiri sudah digelapkan.
- */
-
 import { useCallback, useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
-import { BookOpen, Pencil, Headphones, FileText, Mic } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, BookOpen, Pencil, Headphones, FileText, Mic, Snowflake, Star, Flame, MessagesSquare } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { ProgressView, SkillTag } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
-import { Ring } from '@/components/progress';
 import { WeekStrip } from '@/components/week-strip';
+import { LearningCompanion, LearningPageSkeleton } from '@/components/learning-companion';
 
-interface SkillMeta {
-  label: string;
-  icon: ComponentType<{ size?: number; strokeWidth?: number }>;
-  /** Token `-deep` (bukan `--skill-*` dasar) — sudah diverifikasi >=4.5:1
-   * terhadap teks putih, lihat fix report task-14. */
-  color: string;
-}
-
-const SKILL_META: Record<SkillTag, SkillMeta> = {
-  VOCABULARY: { label: 'Vocabulary', icon: BookOpen, color: 'var(--skill-vocabulary-deep)' },
-  GRAMMAR: { label: 'Grammar', icon: Pencil, color: 'var(--skill-grammar-deep)' },
-  LISTENING: { label: 'Listening', icon: Headphones, color: 'var(--skill-listening-deep)' },
-  READING: { label: 'Reading', icon: FileText, color: 'var(--skill-reading-deep)' },
-  SPEAKING: { label: 'Speaking', icon: Mic, color: 'var(--skill-speaking-deep)' },
+const SKILL_META: Record<SkillTag, { label: string; description: string; icon: ComponentType<{ size?: number }> }> = {
+  VOCABULARY: { label: 'Vocabulary', description: 'Kosakata', icon: BookOpen },
+  GRAMMAR: { label: 'Grammar', description: 'Tata bahasa', icon: Pencil },
+  LISTENING: { label: 'Listening', description: 'Menyimak', icon: Headphones },
+  READING: { label: 'Reading', description: 'Membaca', icon: FileText },
+  SPEAKING: { label: 'Speaking', description: 'Berbicara', icon: Mic },
 };
-
-function ProgressSkeleton() {
-  return (
-    <div className="space-y-3 p-5">
-      <div className="skeleton h-7 w-32 rounded-full" />
-      {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="skeleton h-[72px] rounded-[18px]" />
-      ))}
-      <div className="skeleton h-[150px] rounded-[22px]" />
-      <div className="skeleton h-[100px] rounded-[22px]" />
-    </div>
-  );
-}
 
 export default function ProgressPage() {
   const [progress, setProgress] = useState<ProgressView | null>(null);
@@ -73,119 +27,68 @@ export default function ProgressPage() {
     setLoading(true);
     setLoadError('');
     api<ProgressView>('/progress')
-      .then((p) => {
-        setProgress(p);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoadError(err instanceof Error ? err.message : 'Terjadi kesalahan');
-        setLoading(false);
-      });
+      .then(p => { setProgress(p); setLoading(false); })
+      .catch(err => { setLoadError(err instanceof Error ? err.message : 'Terjadi kesalahan'); setLoading(false); });
   }, []);
 
-  useEffect(() => {
-    loadProgress();
-  }, [loadProgress]);
+  useEffect(() => { loadProgress(); }, [loadProgress]);
 
-  if (!progress && loading) {
-    return <ProgressSkeleton />;
-  }
+  if (!progress && loading) return <LearningPageSkeleton title="Progress" />;
+  if (!progress && loadError) return <div className="flex min-h-screen items-center justify-center px-5">
+    <Card eyebrow="Progress" title="Gagal memuat data" className="w-full max-w-sm text-center">
+      <p className="mb-4 text-sm font-semibold text-muted">Periksa koneksimu, lalu coba lagi.</p>
+      <ChunkyButton variant="ghost" onClick={loadProgress}>Coba lagi</ChunkyButton>
+    </Card>
+  </div>;
+  if (!progress) return null;
 
-  if (!progress && loadError) {
-    return (
-      <div className="flex min-h-screen items-center justify-center px-5">
-        <Card eyebrow="Progress" title="Gagal memuat data" className="w-full max-w-sm text-center">
-          <p className="mb-4 text-sm font-semibold text-muted">
-            Periksa koneksimu, lalu coba lagi.
-          </p>
-          <ChunkyButton variant="ghost" onClick={loadProgress}>
-            Coba lagi
-          </ChunkyButton>
-        </Card>
-      </div>
-    );
-  }
+  const answered = progress.skills.reduce((sum, skill) => sum + skill.answered, 0);
+  const activeDays = progress.week.filter(day => day.state === 'active').length;
+  const format = (n: number) => n.toLocaleString('id-ID');
 
-  if (!progress) {
-    return null;
-  }
+  return <div className="learn-page learn-progress-page">
+    <header className="learn-page-heading"><p className="learn-eyebrow">Jejak langkahmu</p><h1>Kemajuan belajarmu</h1><p>Bukan soal paling cepat. Ini tentang terus bertumbuh.</p></header>
+    <LearningCompanion
+      variant={answered > 0 ? 'proud' : 'welcome'}
+      title={answered > 0 ? 'Setiap latihan meninggalkan jejak.' : 'Kemajuanmu dimulai di sini.'}
+      description={answered > 0 ? `${format(answered)} soal sudah kamu jawab. Terus beri dirimu ruang untuk mencoba dan belajar.` : 'Selesaikan latihan pertamamu, lalu lihat kemampuan dan kebiasaanmu tumbuh di sini.'}
+      message={answered > 0 ? 'Langkah kecilmu berarti.' : 'Aku siap menemanimu.'}
+      footer={<dl className="learn-achievements">
+        <div><dt><Star size={15} aria-hidden="true" />Total XP</dt><dd>{format(progress.totals.xpTotal)}</dd></div>
+        <div><dt><BookOpen size={15} aria-hidden="true" />Materi selesai</dt><dd>{format(progress.totals.lessonsDone)}</dd></div>
+        <div><dt><Flame size={15} aria-hidden="true" />Streak terbaik</dt><dd>{format(progress.totals.longestStreak)} <small>hari</small></dd></div>
+      </dl>}
+    ><Link href="/home" className="learn-text-link">Lanjut belajar <ArrowRight size={17} aria-hidden="true" /></Link></LearningCompanion>
 
-  return (
-    <div className="space-y-3.5 px-5 py-[22px]">
-      <h1 className="text-[22px] font-black text-ink">Progress</h1>
-
-      <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
-        {progress.skills.map((skill) => {
+    <section className="learn-progress-skills" aria-labelledby="skills-heading">
+      <div className="learn-section-heading"><div><p className="learn-eyebrow">Sedikit demi sedikit</p><h2 id="skills-heading">Kemampuanmu</h2></div></div>
+      <p className="learn-section-description">Akurasi jawaban pertama, bukan persentase materi yang selesai.</p>
+      <div className="learn-skill-grid">
+        {progress.skills.map(skill => {
           const meta = SKILL_META[skill.skill];
           const Icon = meta.icon;
-          const hasData = skill.accuracy !== null;
-
-          if (!hasData) {
-            return (
-              <div key={skill.skill} className="skill-row skill-row-empty">
-                <span className="skill-row-icon">
-                  <Icon size={22} strokeWidth={2.25} />
-                </span>
-                <div className="skill-row-info">
-                  <div className="skill-row-title">{meta.label}</div>
-                  <div className="skill-row-sub">Belum ada data</div>
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            <div key={skill.skill} className="skill-row" style={{ background: meta.color }}>
-              <span className="skill-row-icon">
-                <Icon size={22} strokeWidth={2.25} />
-              </span>
-              <div className="skill-row-info">
-                <div className="skill-row-title">{meta.label}</div>
-                <div className="skill-row-sub">{skill.answered} soal dijawab</div>
-              </div>
-              <Ring
-                size={52}
-                stroke={6}
-                pct={skill.accuracy ?? 0}
-                trackClass="skill-ring-track"
-                arcClass="skill-ring-arc"
-              >
-                <span className="skill-ring-pct">{skill.accuracy}%</span>
-              </Ring>
-            </div>
-          );
+          return <article className="learn-skill-card" key={skill.skill}>
+            <div className="learn-skill-heading"><span className="learn-skill-icon"><Icon size={21} aria-hidden="true" /></span><div><h3>{meta.label}</h3><p>{meta.description}</p></div></div>
+            <div className="learn-skill-score"><b>{skill.accuracy == null ? 'Belum ada data' : `${skill.accuracy}%`}</b><span>{format(skill.answered)} soal dijawab</span></div>
+            {skill.accuracy == null ? <p className="learn-skill-empty">Datanya muncul setelah kamu berlatih.</p> : <progress value={skill.accuracy} max={100} aria-label={`Akurasi ${meta.label}`} />}
+          </article>;
         })}
       </div>
+      {progress.skills.length === 0 && <p className="card learn-section-description">Belum ada data kemampuan. Mulai belajar untuk mengisi jejak pertamamu.</p>}
+    </section>
 
-      <Card eyebrow="Minggu ini" title="Kalender streak" className="lg:hidden">
-        <WeekStrip week={progress.week} />
-        <p className="week-legend">🧊 = streak diselamatkan token pembeku</p>
-      </Card>
+    <section className="card learn-consistency" aria-labelledby="consistency-heading">
+      <div className="learn-section-heading"><div><p className="learn-eyebrow">Kebiasaan baik</p><h2 id="consistency-heading">Langkah minggu ini</h2></div><span>{activeDays} hari aktif</span></div>
+      <WeekStrip week={progress.week} />
+      <p className="learn-week-caption">{activeDays === 0 ? 'Minggu ini masih punya ruang untuk satu langkah kecil.' : `Target harian tercapai di ${activeDays} hari minggu ini.`}</p>
+      <p className="learn-freeze-legend"><Snowflake size={14} aria-hidden="true" />Pembeku menjaga streak saat kamu melewatkan sehari.</p>
+    </section>
 
-      <Card eyebrow="Ringkasan" title="Total pencapaian" className="lg:hidden">
-        <div className="totals-grid">
-          <div className="totals-item">
-            <div className="totals-value">{progress.totals.lessonsDone}</div>
-            <div className="totals-label">Lesson selesai</div>
-          </div>
-          <div className="totals-item">
-            <div className="totals-value">{progress.totals.xpTotal}</div>
-            <div className="totals-label">Total XP</div>
-          </div>
-          <div className="totals-item">
-            <div className="totals-value">{progress.totals.longestStreak}</div>
-            <div className="totals-label">Streak terpanjang</div>
-          </div>
-          <div className="totals-item">
-            <div className="totals-value">{progress.totals.voiceConversations}</div>
-            <div className="totals-label">Percakapan AI</div>
-          </div>
-          <div className="totals-item">
-            <div className="totals-value">{progress.totals.voiceMinutes}</div>
-            <div className="totals-label">Menit ngobrol</div>
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
+    <section className="card learn-conversation-summary" aria-labelledby="conversation-heading">
+      <span className="learn-skill-icon"><MessagesSquare size={22} aria-hidden="true" /></span>
+      <div><h2 id="conversation-heading">Keberanian untuk berbicara</h2><p>Ringkasan percakapan AI yang sudah dinilai.</p></div>
+      <dl><div><dt>Percakapan</dt><dd>{format(progress.totals.voiceConversations)}</dd></div><div><dt>Menit ngobrol</dt><dd>{format(progress.totals.voiceMinutes)}</dd></div></dl>
+    </section>
+    <p className="learn-signoff">Bandingkan langkahmu dengan dirimu yang kemarin.</p>
+  </div>;
 }

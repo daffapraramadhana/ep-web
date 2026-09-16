@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Logo } from './logo';
+import { APP_NAME } from '@/lib/brand';
 
 /**
  * AuthShell — bingkai bersama halaman auth (/login, /register,
@@ -12,22 +13,27 @@ export function AuthShell({
   subtitle,
   footer,
   children,
+  intro,
+  className,
 }: {
   title: string;
   subtitle: string;
   footer?: ReactNode;
   children: ReactNode;
+  intro?: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="auth-page">
+    <div className={['auth-page', className].filter(Boolean).join(' ')}>
       <div className="auth-box">
         <div className="auth-wordmark hero-anim hero-anim-1">
           <span className="auth-wordmark-icon">
             <Logo size={28} />
           </span>
-          Fluen
+          {APP_NAME}
         </div>
         <div className="auth-card hero-anim hero-anim-2">
+          {intro}
           <h1 className="auth-title">{title}</h1>
           <p className="auth-subtitle">{subtitle}</p>
           {children}

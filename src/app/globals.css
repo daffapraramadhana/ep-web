@@ -441,11 +441,10 @@ body {
 }
 
 /* ============================================================
-   Hero terang typographic (Beranda) — redesign 26 Agu 2026 (ref
-   Dribbble Scanner/EverSync): sapaan = headline ink besar di latar
-   terang, satu aksen warna = chip highlight .hero-mark, ring target
-   versi brand-di-terang. Blok navy gradien dihapus dari beranda;
-   navy tetap hidup di login & chrome desktop.
+   Hero Beranda — sapaan + maskot pendamping pada panel brand-soft,
+   lalu status dan target harian. Maskot tidak memikul informasi;
+   semua konteks tetap tersedia sebagai teks. Blok navy gradien tetap
+   khusus untuk login dan chrome desktop.
    ============================================================ */
 .hero {
   padding: 26px 22px 8px;
@@ -455,7 +454,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 /* Pill terang tanpa border: streak/XP tint amber, freeze tint sky. */
 .hero-stat {
@@ -483,13 +482,32 @@ body {
   grid-template-columns: 1fr auto;
   gap: 18px;
   align-items: center;
+  margin-top: 14px;
+}
+.hero-welcome {
+  position: relative;
+  min-height: 112px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--brand-soft);
+  padding: 22px 112px 20px 20px;
+}
+.hero-mascot {
+  position: absolute;
+  right: -8px;
+  bottom: -18px;
+  width: 132px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(30, 27, 75, 0.12));
 }
 .hero-greet {
-  font-size: 26px;
+  font-size: 23px;
   font-weight: 900;
   letter-spacing: -0.3px;
   line-height: 1.15;
   color: var(--ink);
+  overflow-wrap: anywhere;
 }
 .hero-greet small {
   display: block;
@@ -499,7 +517,6 @@ body {
   margin-top: 6px;
 }
 .hero-msg {
-  margin-top: 14px;
   font-size: 15px;
   font-weight: 800;
   color: var(--ink);
@@ -658,6 +675,18 @@ body {
    §2 "Kartu": eyebrow -> judul -> meta -> aksi. Status terpilih =
    border brand + latar brand-soft (konsisten dgn .opt.sel mockup).
    ============================================================ */
+.onboarding-mascot {
+  width: 104px;
+  height: 88px;
+  margin: 0 auto 8px;
+  overflow: hidden;
+}
+.onboarding-mascot img {
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 9px rgba(30, 27, 75, 0.12));
+}
 .choice-card {
   display: block;
   width: 100%;
@@ -1293,9 +1322,12 @@ body {
   padding: 24px;
   text-align: center;
 }
-.celebrate-emoji {
-  font-size: 58px;
-  margin-bottom: 6px;
+.celebrate-mascot {
+  width: 164px;
+  height: 164px;
+  object-fit: contain;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 10px 14px rgba(30, 27, 75, 0.14));
 }
 .celebrate-title {
   font-size: 24px;
@@ -2404,8 +2436,7 @@ body {
     outline: 2px solid #fff;
     outline-offset: 2px;
   }
-  /* Hero desktop: typographic yang sama, skala naik. Tanpa kartu navy,
-     watermark, atau glow — hierarki dari ukuran & spasi. */
+  /* Hero desktop: panel maskot yang sama, skala naik. */
   .hero {
     padding: 42px 38px 12px;
   }
@@ -2415,7 +2446,17 @@ body {
     display: none;
   }
   .hero-inner {
-    gap: 44px;
+    gap: 34px;
+    margin-top: 18px;
+  }
+  .hero-welcome {
+    min-height: 142px;
+    padding: 34px 180px 30px 30px;
+  }
+  .hero-mascot {
+    right: -4px;
+    bottom: -28px;
+    width: 184px;
   }
   .hero-greet {
     font-size: 32px;

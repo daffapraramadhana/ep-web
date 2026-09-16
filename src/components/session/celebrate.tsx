@@ -23,6 +23,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { sfx } from '@/lib/sfx';
 import { useMe } from '@/lib/use-me';
 import { ChunkyButton } from '@/components/ui';
+import { Mascot } from '@/components/mascot';
+import { Flame, Star, Target } from 'lucide-react';
+import { refreshSummary } from '@/lib/use-summary';
+import { APP_NAME } from '@/lib/brand';
 import type { AnswerResult } from '@/lib/api-types';
 
 type Summary = NonNullable<AnswerResult['summary']>;
@@ -33,7 +37,7 @@ export interface CelebrateProps {
   onContinue: () => void;
 }
 
-const CONFETTI_COLORS = ['#4F46E5', '#22C55E', '#F59E0B', '#EC4899'];
+const CONFETTI_COLORS = ['#4F46E5', '#CBA62D', '#7CAB4E'];
 const COUNT_UP_MS = 700;
 const COUNT_UP_STEP_MS = 28;
 
@@ -43,9 +47,9 @@ function prefersReducedMotion(): boolean {
 }
 
 function milestoneCopy(milestone: 7 | 30 | 100): string {
-  if (milestone === 7) return 'Seminggu penuh! 🎉';
+  if (milestone === 7) return 'Seminggu penuh. Hebat!';
   if (milestone === 30) return 'Sebulan penuh — luar biasa!';
-  return '100 hari. Legenda. 🏆';
+  return '100 hari. Konsistensi luar biasa.';
 }
 
 interface ConfettiPiece {
@@ -113,6 +117,7 @@ export function Celebrate({ summary, onContinue }: CelebrateProps) {
 
   function handleContinue() {
     mutate();
+    void refreshSummary();
     onContinue();
   }
 
@@ -131,19 +136,27 @@ export function Celebrate({ summary, onContinue }: CelebrateProps) {
         />
       ))}
 
-      <div className="celebrate-emoji">🎉</div>
+      <p className="learn-eyebrow">Sesi selesai</p>
+      <Mascot
+        className="celebrate-mascot"
+        alt={`Maskot ${APP_NAME} ikut merayakan sesi yang selesai`}
+        sizes="220px"
+      />
 
       {summary ? (
         <>
           <h2 className="celebrate-title">
-            {summary.milestone ? milestoneCopy(summary.milestone) : 'Kerja bagus!'}
+            {summary.milestone ? milestoneCopy(summary.milestone) : 'Satu langkah lebih percaya diri.'}
           </h2>
+          <p className="learn-celebrate-copy">Terima kasih sudah meluangkan waktu untuk belajar hari ini.</p>
           <div className="celebrate-cards">
             <div className="celebrate-card">
+              <Star size={19} aria-hidden="true" />
               <div className="celebrate-card-value">{xp}</div>
               <div className="celebrate-card-label">XP</div>
             </div>
             <div className="celebrate-card">
+              <Target size={19} aria-hidden="true" />
               <div className="celebrate-card-value celebrate-card-value-good">
                 {summary.accuracyFirstTry}%
               </div>
@@ -151,15 +164,15 @@ export function Celebrate({ summary, onContinue }: CelebrateProps) {
             </div>
           </div>
           {summary.streakChanged ? (
-            <div className="celebrate-streak">🔥 Streak jadi {summary.streak} hari!</div>
+            <div className="celebrate-streak"><Flame size={20} aria-hidden="true" /> Streak jadi {summary.streak} hari!</div>
           ) : null}
         </>
       ) : (
         <h2 className="celebrate-title">Sesi selesai!</h2>
       )}
 
-      <ChunkyButton variant="good" className="max-w-xs" onClick={handleContinue}>
-        LANJUT
+      <ChunkyButton className="max-w-xs" onClick={handleContinue}>
+        Lanjut
       </ChunkyButton>
     </div>
   );
