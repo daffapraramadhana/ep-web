@@ -10,6 +10,7 @@
  * - AnswerResult: apps/api/src/session/answer.service.ts
  * - MeView / PatchMeRequest: apps/api/src/me/me.controller.ts
  * - SummaryView / NextLessonView: apps/api/src/me/summary.service.ts
+ * - ModulesView / ModuleDetailView / ChapterView / ChapterBlock: apps/api/src/modules/modules.types.ts
  * - JourneyView / JourneyTopicView / JourneyLessonView: apps/api/src/journey/journey.service.ts
  * - ProgressView / ProgressSkillView / ProgressWeekDayView: apps/api/src/progress/progress.service.ts
  * - OverviewView (+ HardestItemView/ExhaustedByLevelView/dst): apps/api/src/monitoring/monitoring.service.ts
@@ -43,9 +44,12 @@ export interface SessionItemView {
 
 export interface SessionView {
   id: string;
-  kind: 'DAILY' | 'REPLAY' | 'SPEAKING';
+  kind: 'DAILY' | 'REPLAY' | 'SPEAKING' | 'MODULE';
   status: 'IN_PROGRESS' | 'COMPLETED';
   lessonTitle: string | null;
+  /** terisi untuk sesi kuis bab — tombol kembali ke modul */
+  moduleSlug: string | null;
+  chapterOrder: number | null;
   items: SessionItemView[];
   progress: { answered: number; total: number };
 }
@@ -125,6 +129,8 @@ export interface SummaryView {
   /** talking agent aktif (config VOICE_AGENT_ENABLED di BE) — kartu
    *  "Ngobrol dengan AI" di Beranda tampil hanya bila true. */
   voiceAgentEnabled: boolean;
+  /** modul yang sedang berjalan — kartu "Lanjutkan modul" di Beranda. */
+  moduleInProgress: ModuleInProgressView | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -338,4 +344,78 @@ export interface ItemReportView {
   createdAt: string;
   reporter: { name: string };
   item: ItemReportItemView;
+}
+
+// ---------------------------------------------------------------------------
+// Menu Modul — GET /modules, /modules/:slug, /modules/:slug/chapters/:order
+// (apps/api/src/modules/modules.types.ts + blocks.ts)
+// ---------------------------------------------------------------------------
+
+export type ModuleInline = { t: string; b?: true; i?: true; code?: true; href?: string }[];
+
+export type ChapterBlock =
+  | { type: 'heading'; level: 2 | 3; text: ModuleInline }
+  | { type: 'paragraph'; text: ModuleInline }
+  | { type: 'list'; ordered: boolean; items: ModuleInline[] }
+  | { type: 'table'; head: ModuleInline[]; rows: ModuleInline[][] }
+  | { type: 'image'; url: string; alt: string }
+  | { type: 'audio'; url: string }
+  | { type: 'phrases'; items: { en: string; id: string; note?: string }[] }
+  | { type: 'dialog'; lines: { speaker: string; role?: string; side: 'left' | 'right'; text: string }[] }
+  | { type: 'tip'; text: ModuleInline[] };
+
+export interface ModuleCard {
+  slug: string;
+  title: string;
+  summary: string;
+  level: 'DASAR' | 'MENENGAH' | 'MAHIR';
+  cefr: string;
+  coverUrl: string | null;
+  chapterCount: number;
+  quizChapterCount: number;
+  doneCount: number;
+  estMinutes: number;
+}
+
+export interface ModulesView {
+  inProgress: ModuleCard | null;
+  forYou: ModuleCard[];
+  others: ModuleCard[];
+}
+
+export interface ModuleChapterRow {
+  id: string;
+  order: number;
+  title: string;
+  estMinutes: number;
+  kind: 'quiz' | 'reading';
+  done: boolean;
+  accuracy: number | null;
+  itemCount: number;
+}
+
+export interface ModuleDetailView extends ModuleCard {
+  nextOrder: number | null;
+  chapters: ModuleChapterRow[];
+}
+
+export interface ChapterView {
+  id: string;
+  order: number;
+  title: string;
+  estMinutes: number;
+  blocks: ChapterBlock[];
+  quiz: { itemCount: number; done: boolean; estXp: number | null } | null;
+  prevOrder: number | null;
+  nextOrder: number | null;
+  chapterCount: number;
+  moduleSlug: string;
+  moduleTitle: string;
+}
+
+export interface ModuleInProgressView {
+  slug: string;
+  title: string;
+  nextOrder: number;
+  nextTitle: string;
 }

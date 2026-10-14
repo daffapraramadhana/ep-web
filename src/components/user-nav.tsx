@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Map, ChartColumn, User, LogOut, Check, Flame } from 'lucide-react';
+import { Home, Map, BookOpenText, ChartColumn, User, LogOut, Check, Flame } from 'lucide-react';
 import type { ComponentType, CSSProperties } from 'react';
 import { useMe, resetMe } from '@/lib/use-me';
 import { useSummary, resetSummary } from '@/lib/use-summary';
@@ -25,6 +25,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/home', label: 'Beranda', icon: Home },
   { href: '/journey', label: 'Perjalanan', icon: Map },
+  { href: '/modules', label: 'Modul', icon: BookOpenText },
   { href: '/progress', label: 'Progress', icon: ChartColumn },
   { href: '/profile', label: 'Profil', icon: User },
 ];
