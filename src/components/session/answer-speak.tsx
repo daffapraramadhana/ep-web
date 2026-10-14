@@ -16,6 +16,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Mic, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
 import type { AnswerResult, SessionItemView } from '@/lib/api-types';
+import { canSpeak as browserCanSpeak, speakEn } from '@/lib/speak';
 
 type RecState = 'idle' | 'recording' | 'recorded';
 
@@ -71,15 +72,10 @@ export function AnswerSpeak({ item, disabled, result, onReady }: AnswerSpeakProp
   // TTS contoh ucapan (Web Speech API, tanpa backend) — Dengarkan contoh.
   // Browser native; nol asset audio. ponytail: kalau butuh audio yang konsisten
   // antar-perangkat, ganti ke audio hasil generate yang disimpan di item.mediaFile.
-  const canSpeak =
-    typeof window !== 'undefined' && 'speechSynthesis' in window && !!item.targetText;
+  const canSpeak = browserCanSpeak() && !!item.targetText;
 
   function speakTarget() {
-    const u = new SpeechSynthesisUtterance(item.targetText!);
-    u.lang = 'en-US';
-    u.rate = 0.85;
-    window.speechSynthesis.cancel(); // hentikan yang sedang berjalan, ganti yang baru
-    window.speechSynthesis.speak(u);
+    speakEn(item.targetText!);
   }
 
   function stopRecording() {
