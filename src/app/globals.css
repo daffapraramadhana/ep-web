@@ -2849,3 +2849,19 @@ body {
 @keyframes talk-spin {
   to { transform: rotate(360deg); }
 }
+
+/* ---- Editor bab modul (admin) ---- */
+.chap-editor { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .chap-editor { grid-template-columns: minmax(0, 1fr); } }
+.chap-pane { background: #fff; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.chap-pane-title { display: flex; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 11px; font-weight: 900; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
+.chap-code { display: flex; height: 560px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.75; }
+.chap-gutter { flex: none; width: 44px; padding: 10px 10px 10px 0; text-align: right; color: #cbd5e1; background: #fafbfc; overflow: hidden; user-select: none; white-space: pre; }
+.chap-gutter .err { color: var(--bad); font-weight: 800; }
+.chap-textarea { flex: 1; resize: none; border: 0; outline: none; padding: 10px 12px; font: inherit; color: #334155; white-space: pre; overflow: auto; }
+.chap-errors { border-top: 1.5px solid var(--bad); background: var(--bad-soft, #fef2f2); color: var(--bad-dark, #b91c1c); padding: 10px 14px; font-size: 13px; font-weight: 800; }
+.chap-errors li + li { margin-top: 2px; }
+.chap-preview { height: 520px; overflow: auto; background: var(--bg); padding: 16px; }
+.chap-preview-frame { max-width: 375px; margin: 0 auto; }
+.chap-cheat { font-size: 12.5px; }
+.chap-cheat pre { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; margin: 4px 0 10px; white-space: pre-wrap; }
