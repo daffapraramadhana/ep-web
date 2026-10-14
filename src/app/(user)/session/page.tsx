@@ -30,11 +30,13 @@ function SessionHeader({
   filled,
   muted,
   onToggleMute,
+  exitHref,
 }: {
   total: number;
   filled: number;
   muted: boolean;
   onToggleMute: () => void;
+  exitHref: string;
 }) {
   const router = useRouter();
   return (
@@ -43,7 +45,7 @@ function SessionHeader({
         type="button"
         aria-label="Keluar dari sesi"
         className="flex h-9 w-9 items-center justify-center text-muted"
-        onClick={() => router.push('/home')}
+        onClick={() => router.push(exitHref)}
       >
         <X size={22} strokeWidth={2.5} />
       </button>
@@ -65,8 +67,10 @@ function SessionBody() {
   const searchParams = useSearchParams();
   const replayLessonId = searchParams.get('replay');
   const speaking = searchParams.get('speaking') === '1';
+  const moduleChapterId = searchParams.get('module');
 
   const {
+    view,
     currentItem,
     total,
     filled,
@@ -78,7 +82,9 @@ function SessionBody() {
     submit,
     next,
     reload,
-  } = useSession(replayLessonId, speaking);
+  } = useSession(replayLessonId, speaking, moduleChapterId);
+  // Kuis bab modul: keluar & selesai kembali ke halaman modul, bukan Beranda.
+  const exitHref = view?.moduleSlug ? `/modules/${view.moduleSlug}` : '/home';
 
   // `null` = belum siap (PERIKSA mati) — kontrak `onReady` komponen jawaban
   // per-tipe (Task 11 brief). Direset lewat remount (`key={item.itemId}`
@@ -153,13 +159,13 @@ function SessionBody() {
   }
 
   if (phase === 'done') {
-    return <Celebrate summary={last?.summary ?? null} onContinue={() => router.push('/home')} />;
+    return <Celebrate summary={last?.summary ?? null} onContinue={() => router.push(exitHref)} />;
   }
 
   // phase 'answering' | 'feedback'
   return (
     <div className="relative flex min-h-screen flex-col">
-      <SessionHeader total={total} filled={filled} muted={muted} onToggleMute={toggleMute} />
+      <SessionHeader total={total} filled={filled} muted={muted} onToggleMute={toggleMute} exitHref={exitHref} />
 
       {currentItem ? (
         <div className="flex flex-1 flex-col px-5 pt-2 pb-6" key={currentItem.itemId}>

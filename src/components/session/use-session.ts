@@ -57,6 +57,7 @@ function buildQueue(view: SessionView): number[] {
 export function useSession(
   replayLessonId: string | null,
   speaking = false,
+  moduleChapterId: string | null = null,
 ): UseSessionResult {
   const [view, setView] = useState<SessionView | null>(null);
   const [queue, setQueue] = useState<number[]>([]);
@@ -78,13 +79,17 @@ export function useSession(
     try {
       const path = replayLessonId
         ? '/session/replay'
-        : speaking
-          ? '/session/speaking'
-          : '/session/today';
-      const nextView = await api<SessionView>(path, {
-        method: 'POST',
-        body: replayLessonId ? JSON.stringify({ lessonId: replayLessonId }) : undefined,
-      });
+        : moduleChapterId
+          ? '/session/module'
+          : speaking
+            ? '/session/speaking'
+            : '/session/today';
+      const body = replayLessonId
+        ? JSON.stringify({ lessonId: replayLessonId })
+        : moduleChapterId
+          ? JSON.stringify({ chapterId: moduleChapterId })
+          : undefined;
+      const nextView = await api<SessionView>(path, { method: 'POST', body });
       const q = buildQueue(nextView);
       setView(nextView);
       setQueue(q);
@@ -96,7 +101,7 @@ export function useSession(
       setLoadError(err instanceof Error ? err.message : 'Terjadi kesalahan');
       setPhase('error');
     }
-  }, [replayLessonId, speaking]);
+  }, [replayLessonId, speaking, moduleChapterId]);
 
   // Guard terhadap React StrictMode dev double-invoke (mount -> cleanup ->
   // mount lagi memanggil effect ini dua kali secara sinkron): tanpa ini,
@@ -108,11 +113,11 @@ export function useSession(
   // `load()` langsung, bukan lewat effect ini, jadi tidak terkena guard ini.
   const loadedKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    const key = replayLessonId ?? (speaking ? 'speaking' : '');
+    const key = replayLessonId ?? (moduleChapterId ? `module:${moduleChapterId}` : speaking ? 'speaking' : '');
     if (loadedKeyRef.current === key) return;
     loadedKeyRef.current = key;
     load();
-  }, [replayLessonId, speaking, load]);
+  }, [replayLessonId, speaking, moduleChapterId, load]);
 
   const submit = useCallback(
     async (answer: string | Blob) => {
