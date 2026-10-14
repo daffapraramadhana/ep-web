@@ -28,6 +28,7 @@ export default function ChapterEditorPage() {
   const [cheat, setCheat] = useState(false);
   const [lessons, setLessons] = useState<LessonOption[]>([]);
   const [pick, setPick] = useState('');
+  const [quizBusy, setQuizBusy] = useState(false);
   const gutterRef = useRef<HTMLDivElement>(null);
 
   const apply = (c: AdminChapterDetail) => {
@@ -56,16 +57,27 @@ export default function ChapterEditorPage() {
             setErrors([]);
           } else setErrors(r.errors); // pratinjau tetap versi valid terakhir
         })
-        .catch(() => {});
+        .catch(() => setMsg('Pratinjau gagal dimuat — periksa koneksi'));
     }, 500);
     return () => clearTimeout(t);
   }, [body, dirty]);
 
   const save = useCallback(async () => {
-    if (saving || errors.length) return;
+    if (saving) return;
     setSaving(true);
     setMsg('');
     try {
+      // Validasi ulang body TERKINI — state `errors` bisa basi bila Cmd+S
+      // ditekan sebelum debounce pratinjau (500 ms) selesai.
+      const check = await api<PreviewResult>('/admin/modules/preview', {
+        method: 'POST',
+        body: JSON.stringify({ body }),
+      });
+      if ('errors' in check) {
+        setErrors(check.errors);
+        setMsg('Perbaiki error dulu sebelum menyimpan');
+        return;
+      }
       apply(await api<AdminChapterDetail>(`/admin/chapters/${chapterId}`, { method: 'PATCH', body: JSON.stringify({ title, estMinutes: minutes, body }) }));
       setMsg('Tersimpan');
     } catch (e) {
@@ -73,7 +85,7 @@ export default function ChapterEditorPage() {
     } finally {
       setSaving(false);
     }
-  }, [saving, errors.length, chapterId, title, minutes, body]);
+  }, [saving, chapterId, title, minutes, body]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -86,7 +98,17 @@ export default function ChapterEditorPage() {
     return () => window.removeEventListener('keydown', onKey);
   }, [save]);
 
+  // Peringatan bawaan browser bila meninggalkan halaman dengan suntingan belum disimpan.
+  useEffect(() => {
+    if (!dirty) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [dirty]);
+
   async function quizAction(fn: () => Promise<unknown>) {
+    if (quizBusy) return;
+    setQuizBusy(true);
     setMsg('');
     try {
       await fn();
@@ -96,6 +118,8 @@ export default function ChapterEditorPage() {
       setPick('');
     } catch (e) {
       setMsg(e instanceof Error ? e.message : 'Terjadi kesalahan');
+    } finally {
+      setQuizBusy(false);
     }
   }
 
@@ -198,20 +222,20 @@ export default function ChapterEditorPage() {
                 </div>
                 <div className="flex gap-2">
                   <Link className="btn-outline-sm" href={`/admin/content/${lesson.id}`}>Kelola soal →</Link>
-                  <button type="button" className="btn-outline-sm" onClick={() => quizAction(() => api(`/admin/chapters/${chapterId}/quiz`, { method: 'PATCH', body: JSON.stringify({ lessonId: null }) }))}>Lepas tautan</button>
+                  <button type="button" className="btn-outline-sm" disabled={quizBusy} onClick={() => quizAction(() => api(`/admin/chapters/${chapterId}/quiz`, { method: 'PATCH', body: JSON.stringify({ lessonId: null }) }))}>Lepas tautan</button>
                 </div>
               </>
             ) : (
               <>
                 <p className="mb-3 text-xs font-bold text-muted">Belum ada kuis — user melihat bab ini sebagai Bacaan.</p>
                 <div className="flex flex-col gap-2">
-                  <ChunkyButton className="btn-sm" onClick={() => quizAction(() => api(`/admin/chapters/${chapterId}/quiz`, { method: 'POST' }))}>Buat kuis</ChunkyButton>
+                  <ChunkyButton className="btn-sm" disabled={quizBusy} aria-busy={quizBusy} onClick={() => quizAction(() => api(`/admin/chapters/${chapterId}/quiz`, { method: 'POST' }))}>{quizBusy ? 'Membuat…' : 'Buat kuis'}</ChunkyButton>
                   <div className="flex gap-2">
                     <select className={`${input} flex-1`} value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Pilih lesson">
                       <option value="">Tautkan lesson yang ada…</option>
                       {lessons.map((l) => <option key={l.id} value={l.id}>{l.code} · {l.title}</option>)}
                     </select>
-                    <button type="button" className="btn-outline-sm" disabled={!pick} onClick={() => quizAction(() => api(`/admin/chapters/${chapterId}/quiz`, { method: 'PATCH', body: JSON.stringify({ lessonId: pick }) }))}>Tautkan</button>
+                    <button type="button" className="btn-outline-sm" disabled={!pick || quizBusy} onClick={() => quizAction(() => api(`/admin/chapters/${chapterId}/quiz`, { method: 'PATCH', body: JSON.stringify({ lessonId: pick }) }))}>Tautkan</button>
                   </div>
                 </div>
               </>

@@ -10,7 +10,7 @@ import type { ModuleChapterRow, ModuleDetailView } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
 import { LearningPageSkeleton } from '@/components/learning-companion';
 import { ModuleCover } from '@/components/modules/module-cover';
-import { LEVEL_LABEL } from '@/lib/modules';
+import { LEVEL_LABEL, MODULE_NOT_FOUND } from '@/lib/modules';
 
 export default function ModulePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -30,10 +30,12 @@ export default function ModulePage() {
   }, [load]);
 
   if (error) {
+    const notFound = error === MODULE_NOT_FOUND;
     return (
       <div className="flex min-h-screen items-center justify-center px-5">
-        <Card eyebrow="Modul" title="Modul tidak ditemukan" className="w-full max-w-sm text-center">
-          <p className="mb-4 text-sm font-semibold text-muted">Modul ini mungkin sudah ditarik. Pilih modul lain.</p>
+        <Card eyebrow="Modul" title={notFound ? 'Modul tidak ditemukan' : 'Gagal memuat modul'} className="w-full max-w-sm text-center">
+          <p className="mb-4 text-sm font-semibold text-muted">{notFound ? 'Modul ini mungkin sudah ditarik. Pilih modul lain.' : 'Periksa koneksimu, lalu coba lagi.'}</p>
+          {notFound ? null : <ChunkyButton className="mb-2" onClick={load}>Coba lagi</ChunkyButton>}
           <ChunkyButton variant="ghost" onClick={() => router.push('/modules')}>Ke daftar modul</ChunkyButton>
         </Card>
       </div>
@@ -43,7 +45,8 @@ export default function ModulePage() {
 
   const allDone = m.quizChapterCount > 0 && m.doneCount === m.quizChapterCount;
   const ctaOrder = m.nextOrder ?? m.chapters[0]?.order ?? 1;
-  const ctaLabel = allDone ? 'ULANGI DARI BAB 1' : m.doneCount === 0 ? 'MULAI BAB 1' : `LANJUTKAN BAB ${ctaOrder}`;
+  const ctaPosition = m.chapters.find((c) => c.order === ctaOrder)?.position ?? 1;
+  const ctaLabel = allDone ? 'ULANGI DARI BAB 1' : m.doneCount === 0 ? 'MULAI BAB 1' : `LANJUTKAN BAB ${ctaPosition}`;
 
   return (
     <div className="learn-page">
@@ -84,7 +87,7 @@ function ChapterRow({ c, next, href }: { c: ModuleChapterRow; next: boolean; hre
   return (
     <Link href={href} className={`mod-ch${next ? ' mod-ch-next' : ''}`}>
       <span className={`mod-num${c.done ? ' mod-num-done' : next ? ' mod-num-next' : ''}`}>
-        {c.done ? <Check size={17} strokeWidth={2.25} aria-label="Selesai" /> : c.kind === 'reading' ? <BookOpenText size={16} strokeWidth={2.25} aria-label="Bacaan" /> : c.order}
+        {c.done ? <Check size={17} strokeWidth={2.25} aria-label="Selesai" /> : c.kind === 'reading' ? <BookOpenText size={16} strokeWidth={2.25} aria-label="Bacaan" /> : c.position}
       </span>
       <div><b>{c.title}</b><small>{sub}</small></div>
       <ChevronRight size={18} strokeWidth={2.25} className="mod-chev" aria-hidden="true" />

@@ -10,6 +10,7 @@ import type { ChapterView, SessionView } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
 import { LearningPageSkeleton } from '@/components/learning-companion';
 import { ChapterBlocks } from '@/components/modules/chapter-blocks';
+import { MODULE_NOT_FOUND } from '@/lib/modules';
 
 export default function ChapterPage() {
   const { slug, order } = useParams<{ slug: string; order: string }>();
@@ -64,10 +65,12 @@ export default function ChapterPage() {
   }
 
   if (error) {
+    const notFound = error === MODULE_NOT_FOUND;
     return (
       <div className="flex min-h-screen items-center justify-center px-5">
-        <Card eyebrow="Modul" title="Bab tidak ditemukan" className="w-full max-w-sm text-center">
-          <p className="mb-4 text-sm font-semibold text-muted">Urutan bab mungkin sudah berubah.</p>
+        <Card eyebrow="Modul" title={notFound ? 'Bab tidak ditemukan' : 'Gagal memuat bab'} className="w-full max-w-sm text-center">
+          <p className="mb-4 text-sm font-semibold text-muted">{notFound ? 'Urutan bab mungkin sudah berubah.' : 'Periksa koneksimu, lalu coba lagi.'}</p>
+          {notFound ? null : <ChunkyButton className="mb-2" onClick={load}>Coba lagi</ChunkyButton>}
           <ChunkyButton variant="ghost" onClick={() => router.push(`/modules/${slug}`)}>Kembali ke modul</ChunkyButton>
         </Card>
       </div>
@@ -80,19 +83,19 @@ export default function ChapterPage() {
       <div className="mod-reader-top">
         <div>
           <Link href={`/modules/${ch.moduleSlug}`} className="mod-back" style={{ margin: 0 }}><ChevronLeft size={18} strokeWidth={2.25} />Kembali</Link>
-          <span>Bab {ch.order} dari {ch.chapterCount}</span>
+          <span>Bab {ch.position} dari {ch.chapterCount}</span>
         </div>
         <div className="mod-readbar" aria-hidden="true"><i style={{ width: `${read}%` }} /></div>
       </div>
 
-      <p className="learn-eyebrow" style={{ marginTop: 20 }}>Bab {ch.order}</p>
+      <p className="learn-eyebrow" style={{ marginTop: 20 }}>Bab {ch.position}</p>
       <h1 style={{ fontSize: 24, fontWeight: 900, lineHeight: 1.2, margin: '4px 0 10px' }}>{ch.title}</h1>
       <ChapterBlocks blocks={ch.blocks} />
 
       {ch.quiz ? (
         <div className="mod-quiz">
           <p className="learn-eyebrow">{ch.quiz.done ? 'Sudah selesai' : 'Coba yang barusan'}</p>
-          <h4>Kuis Bab {ch.order}</h4>
+          <h4>Kuis Bab {ch.position}</h4>
           <p className="mb-3.5 text-[12.5px] font-bold text-muted">
             {ch.quiz.itemCount} soal · ±{Math.max(1, Math.ceil(ch.quiz.itemCount * 0.75))} mnt
             {ch.quiz.estXp !== null ? ` · +${ch.quiz.estXp} XP · dihitung ke target harian` : ' · ulangan, XP percobaan ulang'}
