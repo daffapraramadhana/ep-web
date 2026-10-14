@@ -153,6 +153,14 @@ function SessionBody() {
         <Card eyebrow="Sesi" title="Gagal memuat sesi" className="w-full max-w-sm text-center">
           <p className="mb-4 text-sm font-semibold text-muted">{loadError}</p>
           <ChunkyButton onClick={reload}>Coba lagi</ChunkyButton>
+          {/* Kuis bab gagal (modul ditarik / bab tak ada): jangan buntu — view masih null di sini. */}
+          <ChunkyButton
+            variant="ghost"
+            className="mt-2"
+            onClick={() => router.push(moduleChapterId ? '/modules' : '/home')}
+          >
+            {moduleChapterId ? 'Kembali ke Modul' : 'Ke Beranda'}
+          </ChunkyButton>
         </Card>
       </div>
     );
