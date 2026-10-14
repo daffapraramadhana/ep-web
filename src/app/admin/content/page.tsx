@@ -17,6 +17,7 @@ interface LessonListItem {
   status: string;
   itemCount: number;
   liveItemCount: number;
+  moduleChapter: { moduleTitle: string; order: number } | null;
 }
 
 const LEVELS = ['DASAR', 'MENENGAH', 'MAHIR'];
@@ -139,7 +140,12 @@ export default function ContentPage() {
                 className="admin-table-row-clickable"
               >
                 <td className="font-bold">{l.code}</td>
-                <td>{l.title}</td>
+                <td>
+                  {l.title}
+                  {l.moduleChapter ? (
+                    <div className="text-xs font-bold text-brand">Kuis modul: {l.moduleChapter.moduleTitle} · Bab {l.moduleChapter.order}</div>
+                  ) : null}
+                </td>
                 <td className="text-muted">{l.topic}</td>
                 <td className="text-muted">
                   {l.level} / {l.cefr}

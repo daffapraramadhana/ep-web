@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
+  BookOpenText,
   Upload,
   Table2,
   Image as ImageIcon,
@@ -38,6 +39,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Konten',
     items: [
+      { label: 'Modul', href: '/admin/modul', icon: BookOpenText },
       { label: 'Import Soal', href: '/admin/import', icon: Upload },
       { label: 'Soal & Lesson', href: '/admin/content', icon: Table2 },
       { label: 'Media', href: '/admin/media', icon: ImageIcon },
