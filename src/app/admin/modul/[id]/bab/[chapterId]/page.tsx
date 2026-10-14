@@ -90,7 +90,10 @@ export default function ChapterEditorPage() {
     setMsg('');
     try {
       await fn();
-      apply(await api<AdminChapterDetail>(`/admin/chapters/${chapterId}`));
+      // Hanya panel kuis yang diperbarui — apply() akan menimpa suntingan yang belum disimpan.
+      const fresh = await api<AdminChapterDetail>(`/admin/chapters/${chapterId}`);
+      setCh((prev) => (prev ? { ...prev, lesson: fresh.lesson } : fresh));
+      setPick('');
     } catch (e) {
       setMsg(e instanceof Error ? e.message : 'Terjadi kesalahan');
     }
