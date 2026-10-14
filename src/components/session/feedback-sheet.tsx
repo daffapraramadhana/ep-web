@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { ChunkyButton } from '@/components/ui';
+import { Mascot } from '@/components/mascot';
 import type { AnswerResult } from '@/lib/api-types';
 
 export interface FeedbackSheetProps {
@@ -108,7 +109,11 @@ export function FeedbackSheet({ open, result, itemId, onNext, onToast }: Feedbac
         </div>
       ) : (
         <>
-          <h4 className="feedback-sheet-title">{correct ? 'Benar! 🎯' : 'Belum tepat'}</h4>
+          <div className="feedback-sheet-head">
+            {/* key = itemId: pose pop-in replays for every answered item. */}
+            <Mascot key={itemId ?? undefined} variant={correct ? 'cheerful' : 'thinking'} className="feedback-sheet-mascot" sizes="64px" />
+            <h4 className="feedback-sheet-title">{correct ? 'Benar! 🎯' : 'Belum tepat'}</h4>
+          </div>
           <p className="feedback-sheet-body">
             {shown.explanation}
             {!correct && shown.correctAnswer ? (

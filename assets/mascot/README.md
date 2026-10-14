@@ -1,4 +1,4 @@
-# Velora mascot library
+# Mita — samitaGo mascot library
 
 15 reusable variants from the Expressions and Actions / Usage rows of the supplied character sheet.
 

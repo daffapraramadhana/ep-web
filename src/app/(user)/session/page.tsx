@@ -24,6 +24,7 @@ import { AnswerMc } from '@/components/session/answer-mc';
 import { AnswerIsian } from '@/components/session/answer-isian';
 import { AnswerChips } from '@/components/session/answer-chips';
 import { AnswerSpeak } from '@/components/session/answer-speak';
+import { preloadMascots } from '@/components/mascot-stage';
 
 function SessionHeader({
   total,
@@ -104,6 +105,13 @@ function SessionBody() {
     if (submitError) setToast('Koneksi terputus');
   }, [submitError]);
 
+  // Feedback + celebration poses appear mid-session; warm them up front so
+  // the first reaction never flashes an empty frame.
+  useEffect(() => {
+    preloadMascots(['cheerful', 'thinking'], '64px');
+    preloadMascots(['celebrating', 'achieving'], '220px');
+  }, []);
+
   function toggleMute() {
     const nextMuted = !muted;
     sfx.setMuted(nextMuted);
@@ -176,7 +184,7 @@ function SessionBody() {
       <SessionHeader total={total} filled={filled} muted={muted} onToggleMute={toggleMute} exitHref={exitHref} />
 
       {currentItem ? (
-        <div className="flex flex-1 flex-col px-5 pt-2 pb-6" key={currentItem.itemId}>
+        <div className="session-item flex flex-1 flex-col px-5 pt-2 pb-6" key={currentItem.itemId}>
           <div className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-brand">
             {typeLabel(currentItem.type)}
           </div>

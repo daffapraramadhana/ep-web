@@ -1,4 +1,4 @@
-# ep-web — Velora (Frontend)
+# ep-web — samitaGo (Frontend)
 
 Frontend untuk platform belajar bahasa Inggris harian karyawan. Satu proyek Next.js berisi **dua area**:
 
@@ -45,7 +45,7 @@ Konvensi penting: token desain hidup di `globals.css` (disalin dari design syste
 
 ### Logo & favicon
 
-Mark Velora hidup di dua tempat yang **harus diubah bersamaan**: `src/components/logo.tsx` (komponen React, tanpa latar) dan `src/app/icon.svg` (favicon, dengan latar putih membulat). `favicon.ico` dan `apple-icon.png` adalah turunan `icon.svg` — regenerate sesudah mark berubah. Nama produk dipusatkan di `src/lib/brand.ts`.
+Mark samitaGo hidup di dua tempat yang **harus diubah bersamaan**: `src/components/logo.tsx` (komponen React, tanpa latar) dan `src/app/icon.svg` (favicon, dengan latar putih membulat). `favicon.ico` dan `apple-icon.png` adalah turunan `icon.svg` — regenerate sesudah mark berubah. Nama produk (`APP_NAME`) dan nama maskot Mita (`MASCOT_NAME`) dipusatkan di `src/lib/brand.ts`.
 
 Nama field `fluen_*` di kontrak integrasi voice tetap dipertahankan untuk kompatibilitas dengan webhook/konfigurasi agent yang sudah ada; bukan nama produk yang ditampilkan. Nama repository dan database tidak berubah.
 

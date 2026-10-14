@@ -1,5 +1,5 @@
 /**
- * Logo Velora — toga (belajar) + buku terbuka + dua gelembung percakapan
+ * Logo samitaGo — toga (belajar) + buku terbuka + dua gelembung percakapan
  * (bahasa Inggris untuk dipakai bicara, bukan sekadar dibaca).
  *
  * Garis putih di antara bentuk adalah BAGIAN dari mark, bukan latar —

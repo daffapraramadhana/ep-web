@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
-import { Mascot, type MascotVariant } from '@/components/mascot';
+import type { MascotVariant } from '@/components/mascot';
+import { MascotStage } from '@/components/mascot-stage';
+
+const COMPANION_TAP_POSES: readonly MascotVariant[] = ['curious', 'cheerful', 'winking', 'happy'];
 
 /** Shared, character-led introduction for focused learner pages. */
 export function LearningCompanion({ title, description, message, children, footer, variant = 'default' }: {
@@ -18,7 +21,7 @@ export function LearningCompanion({ title, description, message, children, foote
     </div>
     <div className="learn-companion-stage">
       <p className="learn-bubble">{message}</p>
-      <Mascot variant={variant} className="learn-companion-mascot" sizes="(min-width: 600px) 210px, 160px" priority />
+      <MascotStage variant={variant} tapPoses={COMPANION_TAP_POSES} className="learn-companion-mascot" sizes="(min-width: 600px) 210px, 160px" priority />
     </div>
     {footer && <div className="learn-companion-footer">{footer}</div>}
   </section>;

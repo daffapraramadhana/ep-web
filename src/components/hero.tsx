@@ -2,9 +2,13 @@
 
 import { ArrowRight, Check, Clock3, Flame, Snowflake, Star, Target } from 'lucide-react';
 import Link from 'next/link';
-import { Mascot } from '@/components/mascot';
+import { MascotStage } from '@/components/mascot-stage';
+import type { MascotVariant } from '@/lib/mascot';
 import { ChunkyButton } from '@/components/ui';
 import type { SummaryView } from '@/lib/api-types';
+
+/** Tap cycle on Home: greeting → encouragement → playful. */
+const HOME_TAP_POSES: readonly MascotVariant[] = ['happy', 'excited', 'winking', 'cheerful'];
 
 export interface HeroProps {
   summary: SummaryView;
@@ -49,7 +53,7 @@ export function Hero({ summary: s, starting, onStart }: HeroProps) {
         <div className="learn-stage">
           <p className="learn-bubble">{met ? 'Hebat. Kamu hadir untuk dirimu hari ini!' : s.openSession ? 'Yuk, lanjutkan langkah kecilmu.' : 'Sedikit latihan, lebih percaya diri.'}</p>
           <div className="learn-mascot-ground" aria-hidden="true" />
-          <Mascot className="learn-mascot" priority sizes="(min-width: 600px) 260px, 216px" />
+          <MascotStage variant={met ? 'daily-streak' : 'default'} tapPoses={HOME_TAP_POSES} className="learn-mascot" priority sizes="(min-width: 600px) 260px, 216px" />
         </div>
         <div className="learn-lesson">
           <span className="learn-lesson-label">{s.openSession ? 'Lanjutkan sesimu' : met ? 'Target tercapai · lanjut jika kamu mau' : 'Langkah hari ini'}</span>

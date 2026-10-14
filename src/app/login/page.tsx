@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { ChunkyButton } from '@/components/ui';
 import { AuthShell } from '@/components/auth-shell';
-import { Mascot } from '@/components/mascot';
+import { MascotStage } from '@/components/mascot-stage';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import './login.css';
 
@@ -61,7 +61,7 @@ export default function LoginPage() {
       className="auth-login"
       intro={<div className="login-welcome">
         <p>Langkah kecil.<br /><strong>Percaya diri lebih besar.</strong></p>
-        <Mascot variant="welcome" className="login-mascot" sizes="128px" priority />
+        <MascotStage variant="welcome" className="login-mascot" sizes="128px" priority />
       </div>}
       title="Selamat datang kembali."
       subtitle="Masuk untuk melanjutkan perjalanan belajarmu."

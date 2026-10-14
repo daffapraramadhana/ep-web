@@ -37,6 +37,7 @@ import type {
   VoiceConversationStatusView,
 } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
+import { MascotStage } from '@/components/mascot-stage';
 
 type Phase = 'idle' | 'starting' | 'live' | 'evaluating' | 'done';
 type LiveMode = 'listening' | 'speaking';
@@ -231,6 +232,9 @@ export default function TalkPage() {
         ) : null}
 
         <Card eyebrow="Ngobrol" title="Ngobrol dengan AI">
+          <div className="talk-mascot">
+            <MascotStage variant="speaking" sizes="128px" priority />
+          </div>
           <p className="card-meta">
             Bicara bebas dengan AI tutor dalam bahasa Inggris — bukan menjawab
             soal, tapi percakapan sungguhan. Pakai mikrofonmu, dengarkan balasan
@@ -365,6 +369,9 @@ export default function TalkPage() {
             <p className="mb-4 text-sm font-semibold text-muted">
               Tutor AI mengecek durasi & giliran bicaramu… sebentar lagi.
             </p>
+            <div className="talk-mascot">
+              <MascotStage variant="thinking" sizes="128px" />
+            </div>
             <div className="talk-live-ring talk-evaluating-spinner" />
           </>
         ) : gradingTimeout ? (
@@ -374,6 +381,9 @@ export default function TalkPage() {
           </p>
         ) : result?.passed ? (
           <>
+            <div className="talk-mascot">
+              <MascotStage variant="proud" sizes="128px" />
+            </div>
             <p className="mb-1 text-3xl font-black text-brand">+{result.xpAwarded} XP</p>
             <p className="mb-4 text-sm font-semibold text-muted">
               Percakapan yang asyik! Kamu ngobrol {result.durationSecs} detik.

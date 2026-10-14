@@ -9,6 +9,6 @@ export type MascotVariant = 'default' | typeof MASCOT_VARIANTS[number];
 
 export function getMascotAsset(variant: MascotVariant = 'default') {
   return variant === 'default'
-    ? { src: '/mascot/velora-mascot.webp', width: 900, height: 900 }
+    ? { src: '/mascot/mita.webp', width: 900, height: 900 }
     : { src: `/mascot/variants/${variant}.webp`, width: 768, height: 768 };
 }

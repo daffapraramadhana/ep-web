@@ -1,4 +1,4 @@
-/* Velora learner surfaces: quiet neutrals, indigo actions, character-led delight.
+/* samitaGo learner surfaces: quiet neutrals, indigo actions, character-led delight.
    Scoped so management screens keep their established presentation. */
 .learner-ui { --bg: #f8f9fc; --ink: #25273b; --muted: #686c80; --line: #e6e8ef; background: var(--bg); min-height: 100svh; }
 .learner-ui .btn { min-height: 52px; padding: 13px 20px; font-size: 15px; font-weight: 800; letter-spacing: 0; border-radius: 14px; border-bottom-width: 3px; transition: background .15s, transform .12s; }

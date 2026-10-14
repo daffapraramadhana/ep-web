@@ -23,10 +23,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { sfx } from '@/lib/sfx';
 import { useMe } from '@/lib/use-me';
 import { ChunkyButton } from '@/components/ui';
-import { Mascot } from '@/components/mascot';
+import { MascotStage } from '@/components/mascot-stage';
 import { Flame, Star, Target } from 'lucide-react';
 import { refreshSummary } from '@/lib/use-summary';
-import { APP_NAME } from '@/lib/brand';
+import { MASCOT_NAME } from '@/lib/brand';
 import type { AnswerResult } from '@/lib/api-types';
 
 type Summary = NonNullable<AnswerResult['summary']>;
@@ -136,20 +136,25 @@ export function Celebrate({ summary, onContinue }: CelebrateProps) {
         />
       ))}
 
-      <p className="learn-eyebrow">Sesi selesai</p>
-      <Mascot
-        className="celebrate-mascot"
-        alt={`Maskot ${APP_NAME} ikut merayakan sesi yang selesai`}
-        sizes="220px"
-      />
+      <p className="learn-eyebrow celebrate-rise">Sesi selesai</p>
+      <div className="celebrate-stage">
+        <span className="celebrate-burst" aria-hidden="true" />
+        <MascotStage
+          variant={summary?.milestone ? 'achieving' : 'celebrating'}
+          className="celebrate-mascot"
+          alt={`${MASCOT_NAME} ikut merayakan sesi yang selesai`}
+          sizes="220px"
+          priority
+        />
+      </div>
 
       {summary ? (
         <>
-          <h2 className="celebrate-title">
+          <h2 className="celebrate-title celebrate-rise">
             {summary.milestone ? milestoneCopy(summary.milestone) : 'Satu langkah lebih percaya diri.'}
           </h2>
-          <p className="learn-celebrate-copy">Terima kasih sudah meluangkan waktu untuk belajar hari ini.</p>
-          <div className="celebrate-cards">
+          <p className="learn-celebrate-copy celebrate-rise">Terima kasih sudah meluangkan waktu untuk belajar hari ini.</p>
+          <div className="celebrate-cards celebrate-rise">
             <div className="celebrate-card">
               <Star size={19} aria-hidden="true" />
               <div className="celebrate-card-value">{xp}</div>
@@ -164,14 +169,14 @@ export function Celebrate({ summary, onContinue }: CelebrateProps) {
             </div>
           </div>
           {summary.streakChanged ? (
-            <div className="celebrate-streak"><Flame size={20} aria-hidden="true" /> Streak jadi {summary.streak} hari!</div>
+            <div className="celebrate-streak celebrate-rise"><Flame size={20} aria-hidden="true" /> Streak jadi {summary.streak} hari!</div>
           ) : null}
         </>
       ) : (
-        <h2 className="celebrate-title">Sesi selesai!</h2>
+        <h2 className="celebrate-title celebrate-rise">Sesi selesai!</h2>
       )}
 
-      <ChunkyButton className="max-w-xs" onClick={handleContinue}>
+      <ChunkyButton className="max-w-xs celebrate-rise" onClick={handleContinue}>
         Lanjut
       </ChunkyButton>
     </div>

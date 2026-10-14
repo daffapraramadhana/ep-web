@@ -13,7 +13,7 @@ export interface MascotProps {
 }
 
 /**
- * Velora's official companion mascot.
+ * Mita, samitaGo's official companion mascot.
  *
  * One shared entry point for the default character and its 15 reusable poses.
  */

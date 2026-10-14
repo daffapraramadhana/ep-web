@@ -6,7 +6,8 @@ import { api } from '@/lib/api';
 import { useMe } from '@/lib/use-me';
 import type { Level, MeView, PatchMeRequest } from '@/lib/api-types';
 import { ChunkyButton } from '@/components/ui';
-import { Mascot } from '@/components/mascot';
+import { MascotStage } from '@/components/mascot-stage';
+import { MASCOT_NAME } from '@/lib/brand';
 
 /**
  * Onboarding (Task 9 brief §Step 1) — 2 langkah, state lokal, satu route
@@ -86,8 +87,8 @@ export default function OnboardingPage() {
     <div className="learn-onboarding flex min-h-screen items-center justify-center bg-bg px-4 py-8">
       <div className="w-full max-w-md">
         <div className="learn-onboarding-intro">
-          <Mascot sizes="144px" priority />
-          <p>{step === 1 ? 'Kita mulai dari tempat yang nyaman untukmu.' : 'Pilih ritme yang bisa kamu nikmati setiap hari.'}</p>
+          <MascotStage variant={step === 1 ? 'welcome' : 'excited'} sizes="144px" priority />
+          <p>{step === 1 ? `Hai, aku ${MASCOT_NAME}! Kita mulai dari tempat yang nyaman untukmu.` : 'Pilih ritme yang bisa kamu nikmati setiap hari.'}</p>
         </div>
         <p className="learn-eyebrow mb-3">Langkah {step} dari 2</p>
         <div className="mb-5 flex gap-2" aria-hidden="true">
