@@ -82,7 +82,11 @@ export function useMe() {
     listeners.add(setState);
 
     if (!hasToken()) {
-      setCache({ me: null, loading: false, error: null });
+      // Lokal saja, JANGAN setCache: `loading:false` di cache modul akan
+      // terbaca basi oleh gate root sesudah login (token baru ada, fetch
+      // belum mulai) → dianggap token invalid → token dihapus → balik ke
+      // /login, sehingga user harus submit dua kali.
+      setState({ me: null, loading: false, error: null });
     } else if (cache.me === null && cache.error === null && !inFlight) {
       fetchMe();
     }
