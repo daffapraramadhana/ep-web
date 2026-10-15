@@ -304,6 +304,7 @@
 /* ---- Menu Modul ---------------------------------------------------- */
 .mod-cover { display: grid; place-items: center; flex: none; border-radius: 16px; color: #fff; object-fit: cover; }
 .learner-ui .mod-list { display: grid; gap: 12px; }
+.learner-ui .mod-section { margin-top: 32px; }
 .learner-ui .mod-section-title { margin: 26px 0 10px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
 .learner-ui .mod-card { display: flex; gap: 13px; align-items: flex-start; width: 100%; padding: 16px; background: #fff; border: 1px solid var(--line); border-radius: 20px; text-align: left; }
 .learner-ui .mod-card:hover { border-color: #d6d7ee; }

@@ -2,18 +2,19 @@
 'use client';
 
 /**
- * Tab Modul (spec menu modul §7). GET /modules → kartu "Sedang kamu
- * pelajari" + seksi "Cocok untukmu" (level user) + "Modul lainnya".
- * Skeleton/error meniru Perjalanan.
+ * Tab Modul (spec menu modul §7). GET /modules → kartu pendamping Mita
+ * (`LearningCompanion`, pola sama dengan Perjalanan & Kemajuan) + seksi
+ * "Cocok untukmu" (level user) + "Modul lainnya". Skeleton/error meniru
+ * Perjalanan.
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, BookOpenText, Check } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { ModuleCard, ModulesView } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
-import { LearningPageSkeleton } from '@/components/learning-companion';
+import { LearningCompanion, LearningPageSkeleton } from '@/components/learning-companion';
 import { ModuleCover } from '@/components/modules/module-cover';
 import { LEVEL_LABEL } from '@/lib/modules';
 import { useMe } from '@/lib/use-me';
@@ -50,9 +51,20 @@ export default function ModulesPage() {
     );
   }
 
-  const empty = data.forYou.length + data.others.length === 0;
   const all = [...data.forYou, ...data.others];
+  const empty = all.length === 0;
   const indexOf = (slug: string) => all.findIndex((m) => m.slug === slug);
+  const current = data.inProgress;
+  const suggested = data.forYou[0] ?? data.others[0];
+  const done = current ? current.doneCount : all.reduce((n, m) => n + m.doneCount, 0);
+  const total = current ? current.quizChapterCount : all.reduce((n, m) => n + m.quizChapterCount, 0);
+  const chapterProgress = (
+    <div className="learn-route-progress">
+      <span><BookOpenText size={18} aria-hidden="true" /><b>{done}</b> dari {total} bab kuis selesai</span>
+      {total > 0 && <progress value={done} max={total} aria-label={current ? `Bab selesai di ${current.title}` : 'Bab selesai di semua modul'} />}
+    </div>
+  );
+  const levelLabel = LEVEL_LABEL[me?.level ?? ''];
 
   return (
     <div className="learn-page">
@@ -63,43 +75,55 @@ export default function ModulesPage() {
       </header>
 
       {empty ? (
-        <Card title="Modul sedang disiapkan">
-          <p className="mb-4 text-sm font-semibold text-muted">Sementara itu, lanjutkan latihan harianmu.</p>
+        <LearningCompanion
+          variant="thinking"
+          title="Modul sedang disiapkan."
+          description="Sementara itu, lanjutkan latihan harianmu di Beranda."
+          message="Materinya sedang kusiapkan."
+        >
           <Link className="learn-text-link" href="/home">Ke Beranda <ArrowRight size={17} aria-hidden="true" /></Link>
-        </Card>
-      ) : null}
-
-      {data.inProgress ? (
-        <Card eyebrow="Sedang kamu pelajari" title={data.inProgress.title}>
-          <ProgressLine m={data.inProgress} />
-          <Link href={`/modules/${data.inProgress.slug}`} className="btn" style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-            LANJUTKAN <ArrowRight size={18} aria-hidden="true" />
-          </Link>
-        </Card>
-      ) : null}
+        </LearningCompanion>
+      ) : current ? (
+        <LearningCompanion
+          variant="learning"
+          title={current.title}
+          description="Modul yang sedang kamu pelajari. Lanjutkan bab berikutnya selagi materinya masih segar."
+          message="Ayo lanjutkan bacaanmu!"
+          footer={chapterProgress}
+        >
+          <Link href={`/modules/${current.slug}`} className="btn">Lanjutkan <ArrowRight size={18} aria-hidden="true" /></Link>
+        </LearningCompanion>
+      ) : (
+        <LearningCompanion
+          variant="curious"
+          title="Pilih topik yang ingin kamu kuasai."
+          description="Setiap modul berisi bab bacaan singkat dan kuis kecil. Mulai dari yang paling dekat dengan pekerjaanmu."
+          message="Mau belajar topik apa hari ini?"
+          footer={chapterProgress}
+        >
+          {suggested ? <Link href={`/modules/${suggested.slug}`} className="btn">Mulai modul <ArrowRight size={18} aria-hidden="true" /></Link> : null}
+        </LearningCompanion>
+      )}
 
       {data.forYou.length ? (
-        <>
-          <p className="mod-section-title">Cocok untukmu · {LEVEL_LABEL[me?.level ?? ''] ?? ''}</p>
+        <section className="mod-section" aria-labelledby="mod-for-you">
+          <div className="learn-section-heading">
+            <div><p className="learn-eyebrow">{levelLabel ? `Level ${levelLabel}` : 'Sesuai levelmu'}</p><h2 id="mod-for-you">Cocok untukmu</h2></div>
+            <span>{data.forYou.length} modul</span>
+          </div>
           <div className="mod-list">{data.forYou.map((m) => <ModuleRow key={m.slug} m={m} index={indexOf(m.slug)} />)}</div>
-        </>
+        </section>
       ) : null}
 
       {data.others.length ? (
-        <>
-          <p className="mod-section-title">Modul lainnya</p>
+        <section className="mod-section" aria-labelledby="mod-others">
+          <div className="learn-section-heading">
+            <div><p className="learn-eyebrow">Jelajahi lebih jauh</p><h2 id="mod-others">Modul lainnya</h2></div>
+            <span>{data.others.length} modul</span>
+          </div>
           <div className="mod-list">{data.others.map((m) => <ModuleRow key={m.slug} m={m} index={indexOf(m.slug)} />)}</div>
-        </>
+        </section>
       ) : null}
-    </div>
-  );
-}
-
-function ProgressLine({ m }: { m: ModuleCard }) {
-  return (
-    <div className="mod-progress">
-      <div className="mod-bar"><i style={{ width: `${m.quizChapterCount ? (m.doneCount / m.quizChapterCount) * 100 : 0}%` }} /></div>
-      <span>{m.doneCount}/{m.quizChapterCount}</span>
     </div>
   );
 }
