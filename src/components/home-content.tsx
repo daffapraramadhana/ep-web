@@ -5,6 +5,7 @@ import { AlarmClock, ArrowRight, BookOpen, BookOpenText, ChevronRight, MessagesS
 import type { ProgressView, SummaryView } from '@/lib/api-types';
 import { Hero } from '@/components/hero';
 import { WeekStrip } from '@/components/week-strip';
+import { MASCOT_NAME } from '@/lib/brand';
 
 export function HomeContent({ summary, week, error, starting, startingSpeaking, onStart, onSpeak }: {
   summary: SummaryView;
@@ -27,12 +28,12 @@ export function HomeContent({ summary, week, error, starting, startingSpeaking, 
       <div className="learn-practice-grid">
         <button className="learn-practice-card" onClick={onSpeak} disabled={busy} aria-busy={startingSpeaking}>
           <span className="learn-practice-icon"><Mic size={23} strokeWidth={1.8} /></span>
-          <h3>Berani berbicara</h3><p>Latih pelafalan, satu kalimat setiap kali.</p>
+          <h3>Latihan berbicara</h3><p>Latih pelafalan, satu kalimat setiap kali.</p>
           <span className="learn-practice-action">{startingSpeaking ? 'Menyiapkan…' : 'Latihan berbicara'}<ChevronRight size={17} /></span>
         </button>
         <Link className="learn-practice-card" href={summary.voiceAgentEnabled ? '/talk' : '/journey'}>
           <span className="learn-practice-icon">{summary.voiceAgentEnabled ? <MessagesSquare size={23} strokeWidth={1.8} /> : <BookOpen size={23} strokeWidth={1.8} />}</span>
-          <h3>{summary.voiceAgentEnabled ? 'Mulai percakapan' : 'Langkah berikutnya'}</h3>
+          <h3>{summary.voiceAgentEnabled ? `Talk to ${MASCOT_NAME}` : 'Langkah berikutnya'}</h3>
           <p>{summary.voiceAgentEnabled ? 'Ngobrol santai dengan tutor AI, tanpa naskah.' : 'Lihat materi dan progres perjalanan belajarmu.'}</p>
           <span className="learn-practice-action">{summary.voiceAgentEnabled ? 'Ngobrol dengan AI' : 'Jelajahi materi'}<ChevronRight size={17} /></span>
         </Link>

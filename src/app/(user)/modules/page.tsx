@@ -2,7 +2,7 @@
 'use client';
 
 /**
- * Tab Modul (spec menu modul §7). GET /modules → kartu pendamping Mita
+ * Tab Modul (spec menu modul §7). GET /modules → kartu pendamping Mitha
  * (`LearningCompanion`, pola sama dengan Perjalanan & Kemajuan) + seksi
  * "Cocok untukmu" (level user) + "Modul lainnya". Skeleton/error meniru
  * Perjalanan.
