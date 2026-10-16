@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, resolveApiUrl } from '@/lib/api';
 import { ChunkyButton, StatusPill } from '@/components/ui';
 
 type ItemType = 'PILIHAN_GANDA' | 'ISIAN' | 'SUSUN_KALIMAT' | 'UCAPAN';
@@ -19,6 +19,9 @@ interface ItemRow {
   explanation: string;
   mediaFile: string | null;
   passage: string | null;
+  ttsText: string | null;
+  /** audio yang diputar ke karyawan: file unggahan, selain itu klip TTS server */
+  audioUrl: string | null;
   order: number;
   status: ItemStatus;
 }
@@ -48,6 +51,7 @@ interface FormState {
   explanation: string;
   mediaFile: string;
   passage: string;
+  ttsText: string;
 }
 
 function truncate(s: string, n: number) {
@@ -67,6 +71,7 @@ function toFormState(item: ItemRow): FormState {
     explanation: item.explanation,
     mediaFile: item.mediaFile ?? '',
     passage: item.passage ?? '',
+    ttsText: item.ttsText ?? '',
   };
 }
 
@@ -115,6 +120,10 @@ function buildPatch(item: ItemRow, form: FormState, baseline: FormState) {
 
   if (form.passage !== baseline.passage) {
     patch.passage = form.passage.trim() === '' ? null : form.passage.trim();
+  }
+
+  if (form.ttsText !== baseline.ttsText) {
+    patch.ttsText = form.ttsText.trim() === '' ? null : form.ttsText.trim();
   }
 
   return patch;
@@ -381,6 +390,31 @@ export default function LessonDetailPage() {
                 onChange={(e) => setForm({ ...form, mediaFile: e.target.value })}
                 className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
               />
+            </Field>
+
+            <Field label="Teks audio (TTS)">
+              <textarea
+                value={form.ttsText}
+                onChange={(e) => setForm({ ...form, ttsText: e.target.value })}
+                rows={3}
+                maxLength={600}
+                placeholder={'Dibacakan suara AI. Percakapan: satu baris per kalimat,\nRina: Good afternoon!\nMr. Lee: Hi, Rina.'}
+                className="w-full rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
+              />
+              <p className="mt-1 text-xs font-semibold text-muted">
+                Maks. 600 karakter, maks. 2 pembicara (format <code>Nama: kalimat</code>). Diabaikan bila
+                Berkas Media diisi. Untuk soal ucapan, kosongkan agar contoh dibaca dari kalimat jawaban.
+              </p>
+              {selectedItem?.audioUrl && (
+                <audio
+                  key={selectedItem.audioUrl}
+                  controls
+                  preload="none"
+                  src={resolveApiUrl(selectedItem.audioUrl)}
+                  className="mt-2 w-full"
+                  aria-label="Audio soal tersimpan"
+                />
+              )}
             </Field>
 
             <Field label="Passage">

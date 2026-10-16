@@ -5,6 +5,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { Lightbulb, Volume2 } from 'lucide-react';
 import type { ChapterBlock, ModuleInline } from '@/lib/api-types';
 import { canSpeak, speakEn } from '@/lib/speak';
+import { resolveApiUrl } from '@/lib/api';
+import { playAudio } from '@/lib/play-audio';
 
 /** Render blok bab — dipakai pembaca user & pratinjau admin (gaya: .chapter-blocks di learner.css). */
 export function ChapterBlocks({ blocks }: { blocks: ChapterBlock[] }) {
@@ -42,7 +44,7 @@ function Block({ b, tts }: { b: ChapterBlock; tts: boolean }) {
       // eslint-disable-next-line @next/next/no-img-element
       return <img className="cb-img" src={b.url} alt={b.alt} />;
     case 'audio':
-      return <audio controls preload="none" src={b.url} />;
+      return <audio controls preload="none" src={resolveApiUrl(b.url)} />;
     case 'phrases':
       return (
         <div>
@@ -53,7 +55,7 @@ function Block({ b, tts }: { b: ChapterBlock; tts: boolean }) {
                 <div className="cb-phrase-id">{p.id}</div>
                 {p.note ? <div className="cb-phrase-note">{p.note}</div> : null}
               </div>
-              {tts ? <SpeakButton text={p.en} /> : null}
+              {tts || p.audioUrl ? <SpeakButton text={p.en} audioUrl={p.audioUrl} /> : null}
             </div>
           ))}
         </div>
@@ -67,7 +69,7 @@ function Block({ b, tts }: { b: ChapterBlock; tts: boolean }) {
                 <small>{l.speaker}{l.role ? ` · ${l.role}` : ''}</small>
                 {l.text}
               </div>
-              {tts ? <SpeakButton text={l.text} /> : null}
+              {tts || l.audioUrl ? <SpeakButton text={l.text} audioUrl={l.audioUrl} /> : null}
             </div>
           ))}
         </div>
@@ -82,9 +84,14 @@ function Block({ b, tts }: { b: ChapterBlock; tts: boolean }) {
   }
 }
 
-function SpeakButton({ text }: { text: string }) {
+function SpeakButton({ text, audioUrl }: { text: string; audioUrl?: string | null }) {
   return (
-    <button type="button" className="cb-speak" aria-label={`Dengarkan: ${text}`} onClick={() => speakEn(text)}>
+    <button
+      type="button"
+      className="cb-speak"
+      aria-label={`Dengarkan: ${text}`}
+      onClick={() => (audioUrl ? playAudio(audioUrl, text) : speakEn(text))}
+    >
       <Volume2 size={17} strokeWidth={2.25} />
     </button>
   );

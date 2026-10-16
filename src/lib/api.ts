@@ -14,3 +14,9 @@ export async function api<T = unknown>(path: string, opts: RequestInit = {}): Pr
   }
   return res.json();
 }
+
+/** URL dari API: path relatif (/media/…, /tts/…) diberi prefix NEXT_PUBLIC_API_URL; absolut (S3/MinIO) apa adanya. */
+export function resolveApiUrl(url: string): string {
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${process.env.NEXT_PUBLIC_API_URL ?? ''}${url}`;
+}

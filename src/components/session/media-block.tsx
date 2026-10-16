@@ -20,6 +20,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { sfx } from '@/lib/sfx';
 import type { SessionItemView } from '@/lib/api-types';
+import { resolveApiUrl } from '@/lib/api';
 
 const AUDIO_EXT = new Set(['.mp3', '.m4a']);
 // Bar tinggi statis (dekoratif, bukan visualizer real) — pola naik-turun
@@ -32,14 +33,19 @@ function extOf(url: string): string {
   return dot === -1 ? '' : clean.slice(dot).toLowerCase();
 }
 
-function resolveUrl(url: string): string {
-  if (/^https?:\/\//i.test(url)) return url;
-  return `${process.env.NEXT_PUBLIC_API_URL ?? ''}${url}`;
-}
-
 function AudioPlayer({ url }: { url: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
+  // Audio TTS bisa belum siap (503 saat server sibuk) — tawarkan coba lagi.
+  const [failed, setFailed] = useState(false);
+
+  function retry() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    setFailed(false);
+    audio.load();
+    audio.play().catch(() => {});
+  }
 
   // Autoplay sekali per soal, kecuali bunyi di-mute (mengikuti preferensi
   // global sfx, tombol yang sama dengan header sesi).
@@ -71,11 +77,20 @@ function AudioPlayer({ url }: { url: string }) {
       >
         {playing ? <Pause size={24} strokeWidth={2.5} /> : <Play size={24} strokeWidth={2.5} />}
       </button>
-      <div className="media-audio-wave" aria-hidden="true">
-        {WAVE_HEIGHTS.map((h, i) => (
-          <span key={i} style={{ height: `${h}%` }} />
-        ))}
-      </div>
+      {failed ? (
+        <p className="text-sm font-semibold text-muted" role="alert">
+          Audio belum siap.{' '}
+          <button type="button" className="font-extrabold text-brand underline" onClick={retry}>
+            Coba lagi
+          </button>
+        </p>
+      ) : (
+        <div className="media-audio-wave" aria-hidden="true">
+          {WAVE_HEIGHTS.map((h, i) => (
+            <span key={i} style={{ height: `${h}%` }} />
+          ))}
+        </div>
+      )}
       <audio
         ref={audioRef}
         src={url}
@@ -83,6 +98,7 @@ function AudioPlayer({ url }: { url: string }) {
         aria-label="Audio soal"
         className="sr-only"
         onPlay={() => setPlaying(true)}
+        onError={() => setFailed(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => {
           setPlaying(false);
@@ -118,7 +134,7 @@ export function MediaBlock({ item }: { item: SessionItemView }) {
   return (
     <div>
       {item.mediaUrl ? (
-        isAudio ? <AudioPlayer url={resolveUrl(item.mediaUrl)} /> : <ImageBlock url={resolveUrl(item.mediaUrl)} />
+        isAudio ? <AudioPlayer url={resolveApiUrl(item.mediaUrl)} /> : <ImageBlock url={resolveApiUrl(item.mediaUrl)} />
       ) : null}
       {item.passage ? <PassageBlock text={item.passage} /> : null}
     </div>

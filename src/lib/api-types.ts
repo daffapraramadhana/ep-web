@@ -39,6 +39,7 @@ export interface SessionItemView {
   passage: string | null;
   chips: string[] | null; // SUSUN_KALIMAT: kata answerKey sudah di-shuffle di BE
   targetText: string | null; // UCAPAN: kalimat yang harus diucapkan
+  targetAudioUrl: string | null; // UCAPAN: audio TTS contoh (/tts/{id}.mp3), null → suara browser
   answeredCorrect: boolean;
 }
 
@@ -360,8 +361,11 @@ export type ChapterBlock =
   | { type: 'table'; head: ModuleInline[]; rows: ModuleInline[][] }
   | { type: 'image'; url: string; alt: string }
   | { type: 'audio'; url: string }
-  | { type: 'phrases'; items: { en: string; id: string; note?: string }[] }
-  | { type: 'dialog'; lines: { speaker: string; role?: string; side: 'left' | 'right'; text: string }[] }
+  | { type: 'phrases'; items: { en: string; id: string; note?: string; audioUrl?: string | null }[] }
+  | {
+      type: 'dialog';
+      lines: { speaker: string; role?: string; side: 'left' | 'right'; text: string; audioUrl?: string | null }[];
+    }
   | { type: 'tip'; text: ModuleInline[] };
 
 export interface ModuleCard {

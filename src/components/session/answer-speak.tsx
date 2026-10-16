@@ -17,6 +17,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Mic, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
 import type { AnswerResult, SessionItemView } from '@/lib/api-types';
 import { canSpeak as browserCanSpeak, speakEn } from '@/lib/speak';
+import { playAudio, stopAudio } from '@/lib/play-audio';
 
 type RecState = 'idle' | 'recording' | 'recorded';
 
@@ -63,19 +64,17 @@ export function AnswerSpeak({ item, disabled, result, onReady }: AnswerSpeakProp
   useEffect(() => {
     return () => {
       stopTracks();
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopAudio();
     };
   }, []);
 
-  // TTS contoh ucapan (Web Speech API, tanpa backend) — Dengarkan contoh.
-  // Browser native; nol asset audio. ponytail: kalau butuh audio yang konsisten
-  // antar-perangkat, ganti ke audio hasil generate yang disimpan di item.mediaFile.
-  const canSpeak = browserCanSpeak() && !!item.targetText;
+  // Dengarkan contoh: audio TTS server (Kokoro, sama di semua perangkat);
+  // tanpa URL atau gagal dimuat → suara browser sebagai cadangan.
+  const canSpeak = !!item.targetText && (!!item.targetAudioUrl || browserCanSpeak());
 
   function speakTarget() {
-    speakEn(item.targetText!);
+    if (item.targetAudioUrl) playAudio(item.targetAudioUrl, item.targetText!, { rate: 0.9 });
+    else speakEn(item.targetText!);
   }
 
   function stopRecording() {
