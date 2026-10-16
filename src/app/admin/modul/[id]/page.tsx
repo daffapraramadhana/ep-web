@@ -15,14 +15,14 @@ export default function AdminModuleDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [m, setM] = useState<AdminModuleDetail | null>(null);
-  const [form, setForm] = useState({ title: '', slug: '', summary: '', level: '', cefr: '', coverFile: '' });
+  const [form, setForm] = useState({ title: '', slug: '', summary: '', level: '', cefr: '', coverFile: '', showInPath: false });
   const [media, setMedia] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   const apply = (d: AdminModuleDetail) => {
     setM(d);
-    setForm({ title: d.title, slug: d.slug, summary: d.summary, level: d.level, cefr: d.cefr, coverFile: d.coverFile ?? '' });
+    setForm({ title: d.title, slug: d.slug, summary: d.summary, level: d.level, cefr: d.cefr, coverFile: d.coverFile ?? '', showInPath: d.showInPath });
   };
 
   const load = useCallback(() => {
@@ -96,6 +96,20 @@ export default function AdminModuleDetailPage() {
             <option value="">Tanpa cover (ikon default)</option>
             {media.map((n) => <option key={n} value={n}>{n}</option>)}
           </select>
+        </label>
+        <label className="flex items-start gap-3 rounded-xl border border-line px-3 py-3 md:col-span-3">
+          <input
+            type="checkbox"
+            className="mt-0.5 h-4 w-4 accent-[var(--brand)]"
+            checked={form.showInPath}
+            onChange={(e) => setForm({ ...form, showInPath: e.target.checked })}
+          />
+          <span>
+            <span className="block text-sm font-extrabold text-ink">Tampilkan kuis di Perjalanan & sesi harian</span>
+            <span className="block text-xs font-semibold text-muted">
+              Kuis bab ikut jalur belajar level modul ini, sesi harian, latihan berbicara, dan penguatan. Progres sama dengan di modul — soal tidak digandakan.
+            </span>
+          </span>
         </label>
       </div>
 
