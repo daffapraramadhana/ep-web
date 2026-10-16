@@ -2,11 +2,11 @@
 'use client';
 
 import { Fragment, useEffect, useState } from 'react';
-import { Lightbulb, Volume2 } from 'lucide-react';
+import { Lightbulb, LoaderCircle, Volume2 } from 'lucide-react';
 import type { ChapterBlock, ModuleInline } from '@/lib/api-types';
 import { canSpeak, speakEn } from '@/lib/speak';
 import { resolveApiUrl } from '@/lib/api';
-import { playAudio } from '@/lib/play-audio';
+import { playAudio, type AudioState } from '@/lib/play-audio';
 
 /** Render blok bab — dipakai pembaca user & pratinjau admin (gaya: .chapter-blocks di learner.css). */
 export function ChapterBlocks({ blocks }: { blocks: ChapterBlock[] }) {
@@ -85,14 +85,22 @@ function Block({ b, tts }: { b: ChapterBlock; tts: boolean }) {
 }
 
 function SpeakButton({ text, audioUrl }: { text: string; audioUrl?: string | null }) {
+  // loading = menunggu audio dari server (klip baru bisa butuh beberapa detik)
+  const [state, setState] = useState<AudioState>('idle');
   return (
     <button
       type="button"
       className="cb-speak"
-      aria-label={`Dengarkan: ${text}`}
-      onClick={() => (audioUrl ? playAudio(audioUrl, text) : speakEn(text))}
+      data-state={state}
+      aria-busy={state === 'loading'}
+      aria-label={state === 'loading' ? `Memuat audio: ${text}` : `Dengarkan: ${text}`}
+      onClick={() => (audioUrl ? playAudio(audioUrl, text, { onState: setState }) : speakEn(text))}
     >
-      <Volume2 size={17} strokeWidth={2.25} />
+      {state === 'loading' ? (
+        <LoaderCircle size={17} strokeWidth={2.25} className="audio-spin" aria-hidden="true" />
+      ) : (
+        <Volume2 size={17} strokeWidth={2.25} aria-hidden="true" />
+      )}
     </button>
   );
 }

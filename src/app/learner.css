@@ -367,6 +367,10 @@
 .chapter-blocks .cb-right small { color: #c7d2fe; }
 .chapter-blocks .cb-bubble .cb-speak { width: 26px; height: 26px; }
 .chapter-blocks .cb-right .cb-speak { background: rgba(255,255,255,.18); color: #fff; }
+.chapter-blocks .cb-speak { transition: background .12s, color .12s; }
+.chapter-blocks .cb-speak[data-state='loading'] { cursor: progress; }
+.chapter-blocks .cb-speak[data-state='playing'] { background: var(--brand); color: #fff; }
+.chapter-blocks .cb-right .cb-speak[data-state='playing'] { background: #fff; color: var(--brand); }
 .chapter-blocks .cb-tip { display: flex; gap: 10px; margin: 12px 0; padding: 12px 14px; border-radius: 16px; background: var(--brand-soft); color: var(--brand-dark); font-size: 14px; line-height: 1.5; }
 .chapter-blocks .cb-tip p { font-size: 14px; margin: 0; }
 .chapter-blocks .cb-tip p + p { margin-top: 6px; }

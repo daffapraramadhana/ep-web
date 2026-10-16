@@ -19,13 +19,17 @@ function bestVoice(): SpeechSynthesisVoice | null {
   return null;
 }
 
-export function speakEn(text: string) {
-  if (!canSpeak()) return;
+export function speakEn(text: string, onEnd?: () => void) {
+  if (!canSpeak()) {
+    onEnd?.();
+    return;
+  }
   const u = new SpeechSynthesisUtterance(text);
   const voice = bestVoice();
   u.voice = voice;
   u.lang = voice?.lang ?? 'en-US';
   u.rate = 0.85;
+  if (onEnd) u.onend = u.onerror = () => onEnd();
   window.speechSynthesis.cancel(); // hentikan yang sedang berjalan, ganti yang baru
   window.speechSynthesis.speak(u);
 }

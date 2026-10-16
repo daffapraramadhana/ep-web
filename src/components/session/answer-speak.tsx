@@ -14,10 +14,10 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Mic, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
+import { LoaderCircle, Mic, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
 import type { AnswerResult, SessionItemView } from '@/lib/api-types';
 import { canSpeak as browserCanSpeak, speakEn } from '@/lib/speak';
-import { playAudio, stopAudio } from '@/lib/play-audio';
+import { playAudio, stopAudio, type AudioState } from '@/lib/play-audio';
 
 type RecState = 'idle' | 'recording' | 'recorded';
 
@@ -71,9 +71,11 @@ export function AnswerSpeak({ item, disabled, result, onReady }: AnswerSpeakProp
   // Dengarkan contoh: audio TTS server (Kokoro, sama di semua perangkat);
   // tanpa URL atau gagal dimuat → suara browser sebagai cadangan.
   const canSpeak = !!item.targetText && (!!item.targetAudioUrl || browserCanSpeak());
+  const [listenState, setListenState] = useState<AudioState>('idle');
 
   function speakTarget() {
-    if (item.targetAudioUrl) playAudio(item.targetAudioUrl, item.targetText!, { rate: 0.9 });
+    if (item.targetAudioUrl)
+      playAudio(item.targetAudioUrl, item.targetText!, { rate: 0.9, onState: setListenState });
     else speakEn(item.targetText!);
   }
 
@@ -152,9 +154,19 @@ export function AnswerSpeak({ item, disabled, result, onReady }: AnswerSpeakProp
     <div className="mb-5">
       {canSpeak && (
         <div className="mb-2 flex justify-end">
-          <button type="button" className="speak-listen" onClick={speakTarget}>
-            <Volume2 size={15} strokeWidth={2.5} />
-            Dengarkan contoh
+          <button
+            type="button"
+            className="speak-listen"
+            data-state={listenState}
+            aria-busy={listenState === 'loading'}
+            onClick={speakTarget}
+          >
+            {listenState === 'loading' ? (
+              <LoaderCircle size={15} strokeWidth={2.5} className="audio-spin" aria-hidden="true" />
+            ) : (
+              <Volume2 size={15} strokeWidth={2.5} aria-hidden="true" />
+            )}
+            {listenState === 'loading' ? 'Memuat…' : 'Dengarkan contoh'}
           </button>
         </div>
       )}
