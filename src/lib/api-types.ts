@@ -11,7 +11,7 @@
  * - MeView / PatchMeRequest: apps/api/src/me/me.controller.ts
  * - SummaryView / NextLessonView: apps/api/src/me/summary.service.ts
  * - ModulesView / ModuleDetailView / ChapterView / ChapterBlock: apps/api/src/modules/modules.types.ts
- * - JourneyView / JourneyTopicView / JourneyLessonView: apps/api/src/journey/journey.service.ts
+ * - JourneyView / JourneyUnitView / JourneyStepView: apps/api/src/journey/journey.service.ts
  * - ProgressView / ProgressSkillView / ProgressWeekDayView: apps/api/src/progress/progress.service.ts
  * - OverviewView (+ HardestItemView/ExhaustedByLevelView/dst): apps/api/src/monitoring/monitoring.service.ts
  * - EmployeeListItemView / EmployeeDetailView (+ tipe pendukung): apps/api/src/monitoring/monitoring.service.ts
@@ -123,6 +123,8 @@ export interface OpenSessionView {
   lessonTitle: string | null;
   answered: number;
   total: number;
+  /** jenis sesi — Beranda melanjutkan lewat jalur asalnya */
+  kind: 'DAILY' | 'SPEAKING' | 'MODULE';
   /** terisi hanya untuk sesi kuis bab (MODULE) */
   moduleChapterId: string | null;
 }
