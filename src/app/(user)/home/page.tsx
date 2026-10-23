@@ -53,6 +53,19 @@ export default function HomePage() {
 
   async function startSession() {
     if (starting || startingSpeaking) return;
+    // Satu ajakan lanjut (spec satu-perjalanan §5.5): sesi kuis bab yang
+    // berjalan dilanjutkan; langkah berikutnya berupa bab → halaman bab
+    // (baca dulu, lalu kuis); selain itu sesi harian.
+    const openChapterId = summary?.openSession?.moduleChapterId;
+    const nextChapter = summary?.openSession ? null : summary?.nextLesson?.chapter;
+    if (openChapterId) {
+      router.push(`/session?module=${openChapterId}`);
+      return;
+    }
+    if (nextChapter) {
+      router.push(`/modules/${nextChapter.moduleSlug}/${nextChapter.order}`);
+      return;
+    }
     setError('');
     setStarting(true);
     try {

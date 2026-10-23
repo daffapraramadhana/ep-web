@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { AlarmClock, ArrowRight, BookOpen, BookOpenText, ChevronRight, MessagesSquare, Mic } from 'lucide-react';
+import { AlarmClock, ArrowRight, BookOpen, ChevronRight, MessagesSquare, Mic } from 'lucide-react';
 import type { ProgressView, SummaryView } from '@/lib/api-types';
 import { Hero } from '@/components/hero';
 import { WeekStrip } from '@/components/week-strip';
@@ -20,9 +20,6 @@ export function HomeContent({ summary, week, error, starting, startingSpeaking, 
   return <div className="learn-home">
     {error && <p className="learn-error" role="alert">{error}</p>}
     <Hero summary={summary} starting={busy} onStart={onStart} />
-    {summary.moduleInProgress && <Link className="learn-review" href={`/modules/${summary.moduleInProgress.slug}/${summary.moduleInProgress.nextOrder}`}>
-      <BookOpenText size={22} aria-hidden="true" style={{ color: 'var(--brand)' }} /><span><b>Lanjutkan modul</b><small>{summary.moduleInProgress.title} · Bab {summary.moduleInProgress.nextPosition} berikutnya</small></span><ChevronRight size={18} aria-hidden="true" />
-    </Link>}
     <section className="learn-practice" aria-labelledby="practice-title">
       <div className="learn-section-heading"><div><p className="learn-eyebrow">Sedikit eksplorasi</p><h2 id="practice-title">Temukan ritmemu</h2></div><Link href="/journey">Perjalanan <ArrowRight size={16} aria-hidden="true" /></Link></div>
       <div className="learn-practice-grid">

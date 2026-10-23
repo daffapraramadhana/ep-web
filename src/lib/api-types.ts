@@ -101,19 +101,30 @@ export interface PatchMeRequest {
 // GET /me/summary — apps/api/src/me/summary.service.ts
 // ---------------------------------------------------------------------------
 
+/** Langkah `now` Perjalanan — pelajaran atau bab modul. */
 export interface NextLessonView {
-  id: string;
-  title: string;
-  topic: string;
+  id: string; // lessonId
+  title: string; // judul lesson | judul bab
+  topic: string; // judul unit
   itemCount: number;
   estMinutes: number;
   xpEstimate: number;
+  kind: 'lesson' | 'chapter';
+  unit: { position: number; title: string };
+  chapter: {
+    moduleSlug: string;
+    chapterId: string;
+    order: number;
+    position: number;
+  } | null;
 }
 
 export interface OpenSessionView {
   lessonTitle: string | null;
   answered: number;
   total: number;
+  /** terisi hanya untuk sesi kuis bab (MODULE) */
+  moduleChapterId: string | null;
 }
 
 export interface SummaryView {
@@ -130,8 +141,6 @@ export interface SummaryView {
   /** talking agent aktif (config VOICE_AGENT_ENABLED di BE) — kartu
    *  "Ngobrol dengan AI" di Beranda tampil hanya bila true. */
   voiceAgentEnabled: boolean;
-  /** modul yang sedang berjalan — kartu "Lanjutkan modul" di Beranda. */
-  moduleInProgress: ModuleInProgressView | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -432,12 +441,4 @@ export interface ChapterView {
   chapterCount: number;
   moduleSlug: string;
   moduleTitle: string;
-}
-
-export interface ModuleInProgressView {
-  slug: string;
-  title: string;
-  nextOrder: number;
-  nextPosition: number;
-  nextTitle: string;
 }

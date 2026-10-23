@@ -39,8 +39,6 @@ export interface AdminModuleDetail {
   coverUrl: string | null;
   order: number;
   status: string;
-  /** kuis bab ikut Perjalanan & sesi harian */
-  showInPath: boolean;
   chapters: { id: string; order: number; title: string; estMinutes: number; lesson: AdminLessonSummary | null }[];
 }
 

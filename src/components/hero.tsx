@@ -31,9 +31,12 @@ export function Hero({ summary: s, starting, onStart }: HeroProps) {
   const met = s.sessionsCompletedToday >= target;
   const lesson = s.nextLesson;
   const canStart = !!(s.openSession || lesson || s.contentExhausted);
+  const chapter = lesson?.chapter ?? null;
   const title = s.openSession
     ? s.openSession.lessonTitle ?? 'Sesi penguatan'
-    : lesson?.title ?? (s.contentExhausted ? 'Perkuat yang sudah kamu pelajari' : 'Perjalananmu segera dimulai');
+    : lesson
+      ? chapter ? `Bab ${chapter.position} · ${lesson.title}` : lesson.title
+      : s.contentExhausted ? 'Perkuat yang sudah kamu pelajari' : 'Perjalananmu segera dimulai';
 
   return (
     <header className="learn-hero">
@@ -61,7 +64,10 @@ export function Hero({ summary: s, starting, onStart }: HeroProps) {
           <p className="learn-lesson-description">
             {s.openSession
               ? `${s.openSession.answered} dari ${s.openSession.total} soal selesai. Kita lanjut dari tempatmu berhenti.`
-              : lesson ? lesson.topic
+              : lesson
+                ? chapter
+                  ? `Unit ${lesson.unit.position} · ${lesson.unit.title}. Baca materinya dulu, lalu kerjakan kuis bab.`
+                  : `Unit ${lesson.unit.position} · ${lesson.topic}`
                 : s.contentExhausted ? 'Semua materi di levelmu sudah selesai. Jaga kemampuanmu dengan latihan penguatan.'
                   : 'Materi untuk levelmu sedang disiapkan. Kamu bisa melihat perjalanan belajarmu.'}
           </p>
