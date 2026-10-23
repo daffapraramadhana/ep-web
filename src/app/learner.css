@@ -249,6 +249,9 @@
 .learner-ui .learn-route-now .learn-route-state { color: var(--brand); }
 .learner-ui .learn-route-done .learn-route-state { color: var(--good-dark); }
 .learner-ui .learn-route-trailing { color: var(--brand); flex-shrink: 0; }
+.learner-ui .learn-route-reading .learn-route-card { background: transparent; border-style: dashed; border-bottom-width: 1px; }
+.learner-ui .learn-route-reading .learn-route-marker { color: var(--muted); }
+.learner-ui .learn-route-unit-icon { display: inline; vertical-align: -2px; margin-right: 6px; color: var(--brand); }
 .learner-ui .learn-achievements { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .learner-ui .learn-achievements > div + div { border-left: 1px solid var(--line); padding-left: 12px; }
 .learner-ui .learn-achievements dt { min-height: 30px; font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 5px; line-height: 1.5; }

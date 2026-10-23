@@ -5,8 +5,11 @@
  * error/retry/skeleton MENIRU pola Beranda (home/page.tsx) persis: skeleton
  * saat loading pertama, kartu error + "Coba lagi" saat gagal.
  *
- * Tap node 'now' -> POST /session/today (sama seperti tombol MULAI di
- * Beranda) lalu push ke /session. Tap node 'done' -> konfirmasi ringan
+ * Perjalanan per unit (spec satu-perjalanan): unit topik berisi pelajaran,
+ * unit modul berisi bab. Bab (kuis/bacaan, tidak terkunci) -> halaman bab
+ * /modules/{slug}/{order} (baca lalu kuis). Pelajaran 'now' -> POST
+ * /session/today (sama seperti tombol MULAI di Beranda) lalu push ke
+ * /session. Pelajaran 'done' -> konfirmasi ringan
  * ("Ulangi lesson ini? XP dihitung sebagai ulangan") -> push ke
  * `/session?replay=<lessonId>`; useSession di halaman sesi yang memanggil
  * POST /session/replay sendiri begitu melihat query param itu (lihat
@@ -17,7 +20,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import type { JourneyLessonView, JourneyView } from '@/lib/api-types';
+import type { JourneyStepView, JourneyView } from '@/lib/api-types';
 import { Card, ChunkyButton } from '@/components/ui';
 import { JourneyPath } from '@/components/journey-path';
 import { LearningCompanion, LearningPageSkeleton } from '@/components/learning-companion';
@@ -34,7 +37,7 @@ export default function JourneyPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [startingNow, setStartingNow] = useState(false);
-  const [confirmLesson, setConfirmLesson] = useState<JourneyLessonView | null>(null);
+  const [confirmLesson, setConfirmLesson] = useState<JourneyStepView | null>(null);
   const [toast, setToast] = useState('');
 
   const loadJourney = useCallback(() => {
@@ -73,8 +76,16 @@ export default function JourneyPage() {
     }
   }
 
-  function tapLocked() {
-    setToast('Selesaikan materi sebelumnya untuk membuka langkah ini.');
+  function tapStep(step: JourneyStepView) {
+    if (step.state === 'locked') {
+      setToast('Selesaikan materi sebelumnya untuk membuka langkah ini.');
+    } else if (step.chapter) {
+      router.push(`/modules/${step.chapter.moduleSlug}/${step.chapter.order}`);
+    } else if (step.state === 'now') {
+      void tapNow();
+    } else {
+      setConfirmLesson(step);
+    }
   }
 
   function confirmReplay() {
@@ -105,10 +116,9 @@ export default function JourneyPage() {
     return null;
   }
 
-  const lessons = journey.topics.flatMap(topic => topic.lessons);
-  const completed = lessons.filter(lesson => lesson.state === 'done').length;
-  const next = lessons.find(lesson => lesson.state === 'now');
-  const allDone = lessons.length > 0 && completed === lessons.length;
+  const { done: completed, total } = journey;
+  const next = journey.units.flatMap(unit => unit.steps).find(step => step.state === 'now');
+  const allDone = total > 0 && completed === total;
 
   return (
     <div className="learn-page learn-journey-page">
@@ -116,18 +126,16 @@ export default function JourneyPage() {
       <LearningCompanion
         variant={allDone ? 'achieving' : 'exploring'}
         title={next?.title ?? (allDone ? 'Lihat sejauh apa kamu melangkah.' : 'Langkah pertamamu menanti.')}
-        description={next ? 'Ini materi berikutnya untukmu. Sedikit latihan hari ini, lebih percaya diri esok hari.' : allDone ? 'Semua materi di levelmu sudah selesai. Pilih materi di bawah untuk menguatkan ingatanmu.' : 'Materi untuk levelmu sedang disiapkan. Kembali ke Beranda untuk melihat latihan yang tersedia.'}
+        description={next ? next.kind === 'chapter' ? 'Bab berikutnya untukmu. Baca materinya dulu, lalu kerjakan kuis bab.' : 'Ini materi berikutnya untukmu. Sedikit latihan hari ini, lebih percaya diri esok hari.' : allDone ? 'Semua materi di levelmu sudah selesai. Pilih materi di bawah untuk menguatkan ingatanmu.' : 'Materi untuk levelmu sedang disiapkan. Kembali ke Beranda untuk melihat latihan yang tersedia.'}
         message={allDone ? 'Bangga dengan langkahmu!' : 'Kita jelajahi bersama.'}
-        footer={<div className="learn-route-progress"><span><BookOpen size={18} aria-hidden="true" /><b>{completed}</b> dari {lessons.length} materi selesai</span>{lessons.length > 0 && <progress value={completed} max={lessons.length} aria-label="Materi yang selesai di perjalanan ini" />}</div>}
+        footer={<div className="learn-route-progress"><span><BookOpen size={18} aria-hidden="true" /><b>{completed}</b> dari {total} langkah selesai</span>{total > 0 && <progress value={completed} max={total} aria-label="Langkah yang selesai di perjalanan ini" />}</div>}
       >
-        {next ? <ChunkyButton onClick={tapNow} disabled={startingNow} aria-busy={startingNow}>{startingNow ? 'Menyiapkan sesi…' : 'Mulai belajar'}<ArrowRight size={18} aria-hidden="true" /></ChunkyButton> : <Link className="learn-text-link" href={allDone ? '/progress' : '/home'}>{allDone ? 'Lihat kemajuanmu' : 'Ke Beranda'}<ArrowRight size={17} aria-hidden="true" /></Link>}
+        {next ? <ChunkyButton onClick={() => tapStep(next)} disabled={startingNow} aria-busy={startingNow}>{startingNow ? 'Menyiapkan sesi…' : 'Mulai belajar'}<ArrowRight size={18} aria-hidden="true" /></ChunkyButton> : <Link className="learn-text-link" href={allDone ? '/progress' : '/home'}>{allDone ? 'Lihat kemajuanmu' : 'Ke Beranda'}<ArrowRight size={17} aria-hidden="true" /></Link>}
       </LearningCompanion>
       <JourneyPath
-        topics={journey.topics}
+        units={journey.units}
         nowDisabled={startingNow}
-        onTapDone={setConfirmLesson}
-        onTapNow={tapNow}
-        onTapLocked={tapLocked}
+        onTapStep={tapStep}
       />
 
       {confirmLesson ? (

@@ -159,23 +159,37 @@ export interface VoiceConversationStatusView {
 // GET /journey — apps/api/src/journey/journey.service.ts
 // ---------------------------------------------------------------------------
 
-export type JourneyLessonState = 'done' | 'now' | 'locked';
+export type JourneyStepState = 'done' | 'now' | 'locked';
 
-export interface JourneyLessonView {
-  id: string;
-  title: string;
-  order: number;
-  state: JourneyLessonState;
+export interface JourneyStepView {
+  kind: 'lesson' | 'chapter' | 'reading';
+  id: string; // lessonId (lesson/chapter) | chapterId (reading)
+  title: string; // judul lesson | judul bab
+  state: JourneyStepState | null; // null untuk reading
   accuracy: number | null; // first-try %, hanya untuk state 'done'
+  itemCount: number; // 0 untuk reading
+  chapter: {
+    moduleSlug: string;
+    chapterId: string;
+    order: number;
+    position: number;
+    estMinutes: number;
+  } | null;
 }
 
-export interface JourneyTopicView {
-  topic: string;
-  lessons: JourneyLessonView[];
+export interface JourneyUnitView {
+  kind: 'topic' | 'module';
+  title: string;
+  moduleSlug: string | null;
+  done: number; // langkah dihitung saja (lesson/chapter)
+  total: number;
+  steps: JourneyStepView[];
 }
 
 export interface JourneyView {
-  topics: JourneyTopicView[];
+  units: JourneyUnitView[];
+  done: number;
+  total: number;
 }
 
 // ---------------------------------------------------------------------------
